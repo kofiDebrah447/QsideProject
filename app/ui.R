@@ -169,27 +169,29 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               selected = NULL)
                                                            )
                                                          ),
-                                                         h3("Charge Variables"),
                                                          fluidRow(
-                                                           column(width=3,
+                                                           column(width=4,
+                                                                  h3("Charge Variables")),
+                                                           column(width=4,
+                                                                  h3("Arrest")),
+                                                           column(width=4,
+                                                                  h3("Type of Arrest"))
+                                                         ),
+                                                         fluidRow(
+                                                           column(width=4,
                                                                   selectizeInput("select_charges",
                                                                                  "Select Charge Column(s)",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
                                                                                  multiple = TRUE)
-                                                           )
-                                                         ),
-                                                         h3("Type of Arrest"),
-                                                         fluidRow(
-                                                           column(width=3,
+                                                           ),
+                                                           column(width=4,
                                                                   selectInput("select_arrest",
                                                                               "Arrest Column",
                                                                               choices = NULL,
                                                                               selected = NULL)
-                                                           )
-                                                         ),
-                                                         fluidRow(
-                                                           column(width=12,
+                                                           ),
+                                                           column(width=4,
                                                                   selectizeInput("select_arrestTypes",
                                                                                  "Select Arrest Type(s)",
                                                                                  choices = NULL,
@@ -197,27 +199,28 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  multiple = TRUE)
                                                            )
                                                          ),
-                                                         h3("Bond Amount"),
                                                          fluidRow(
-                                                           column(width=3,
+                                                           column(width=4,
+                                                                  h3("Bond Amount")),
+                                                           column(width=4,
+                                                                  h3("Patrol Unit")),
+                                                           column(width=4,
+                                                                  h3("Arresting Officer"))
+                                                         ),
+                                                         fluidRow(
+                                                           column(width=4,
                                                                   selectInput("select_bond",
                                                                               "Bond Amount Column",
                                                                               choices = NULL,
                                                                               selected = NULL)
-                                                           )
-                                                         ),
-                                                         h3("Patrol Unit"),
-                                                         fluidRow(
-                                                           column(width=3,
+                                                           ),
+                                                           column(width=4,
                                                                   selectInput("select_patrol",
                                                                               "Patrol Unit Column",
                                                                               choices = NULL,
                                                                               selected = NULL)
-                                                           )
-                                                         ),
-                                                         h3("Arresting Officer"),
-                                                         fluidRow(
-                                                           column(width=3,
+                                                           ),
+                                                           column(width=4,
                                                                   selectInput("select_arrestingofficer",
                                                                               "Arresting Officer Column",
                                                                               choices = NULL,

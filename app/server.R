@@ -936,8 +936,7 @@ server <- (function(input, output, session){
       group_by(Day, Time) %>%
       summarise(count = n()) %>%
       mutate(Day = factor(Day, levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))) %>%
-      mutate(Time = as.factor(Time)) %>%
-      mutate(proportion = prop.table(count))
+      mutate(Time = as.factor(Time)) 
     
     p <- qdata %>%
       ggplot(aes(x = Time, y = count, group = Day, color = Day)) +
@@ -948,7 +947,11 @@ server <- (function(input, output, session){
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
     qExcel <- qdata %>%
-      pivot_wider(names_from = c("Time"), values_from = "proportion") 
+      pivot_wider(names_from = c("Time"), values_from = "count") %>%
+      ungroup()%>%
+      mutate(newSum = select_if(., is.numeric) %>% reduce(`+`)) %>% 
+      mutate_if(is.numeric, list(~ ./newSum)) %>% 
+      select(-newSum)
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Hour")
