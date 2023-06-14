@@ -885,7 +885,8 @@ qdata <- policingdata %>%
   group_by(Day, Time) %>%
   summarise(count = n()) %>%
   mutate(Day = factor(Day, levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))) %>%
-  mutate(Time = as.factor(Time))
+  mutate(Time = as.factor(Time))%>%
+  mutate(proportion = prop.table(count))
 
 p <- qdata %>%
   ggplot(aes(x = Time, y = count, group = Day, color = Day)) +

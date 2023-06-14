@@ -80,7 +80,6 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                               tabPanel("Data Input", br(), value = "datainput",
                                                        fluidPage(
                                                          fileInput("file_upload", "Upload a File",accept=c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
-                                                         checkboxInput("header", "This file contains header", TRUE),
                                                          actionButton("sample", "Sample dataset"),
                                                          hidden(div(id='choose_sample', 
                                                                     selectInput("sample_data_choice","Sample Data:", 
@@ -239,7 +238,8 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               choices = NULL,
                                                                               selected = NULL)
                                                            )
-                                                         )
+                                                         ),
+                                                         downloadButton("downloadresults", "Download Results"), br(), br(), br()
                                                        )
                                               ),
                                               
