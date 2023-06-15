@@ -229,7 +229,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               selected = NULL)
                                                            )
                                                          ),
-                                                         h3("Date and Type"),
+                                                         h3("Date and Time"),
                                                          fluidRow(
                                                            column(width=3,
                                                                   selectInput("select_date",
