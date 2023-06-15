@@ -5,7 +5,22 @@ server <- (function(input, output, session){
   # Global variables ----
   globalVars <- reactiveValues()
   globalVars$sample <- FALSE
+  shinyjs::hide("downloadresultsZip")
+  hideTab(inputId = "main", target = "Q1")
+  hideTab(inputId = "main", target = "Q2")
+  hideTab(inputId = "main", target = "Q3")
+  hideTab(inputId = "main", target = "Q4")
+  hideTab(inputId = "main", target = "Q5")
+  hideTab(inputId = "main", target = "Q6")
+  hideTab(inputId = "main", target = "Q7")
+  hideTab(inputId = "main", target = "Q8")
+  hideTab(inputId = "main", target = "Q9")
+  hideTab(inputId = "main", target = "Q10")
+  
+  shinyjs::hide("county")
+  shinyjs::hide("municipality")
 
+  
   ##############################################
   # PROCESS UPLOADED DATA
   ##############################################
@@ -49,7 +64,7 @@ server <- (function(input, output, session){
       
       # fill charge column selectize
       updateSelectizeInput(session, "select_charges", choices = c(colnames(globalVars$dataset)), selected = paste0("charge",1:25))
-        
+      
       # fill arrest column select
       updateSelectInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = "typeofarrest")
       
@@ -64,7 +79,7 @@ server <- (function(input, output, session){
       
       # fill arresting officer column select
       updateSelectInput(session, "select_arrestingofficer", choices = c(colnames(globalVars$dataset)), selected = "Officer")
-
+      
       # fill date column select
       updateSelectInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = "datetimeofarrest")
       
@@ -90,6 +105,21 @@ server <- (function(input, output, session){
   ##############################################################################################################
   observe({
     
+  })
+  
+  observeEvent(input$state,{
+    if(input$state != "Select..."){
+      census_api_key(input$census_api_key)
+      counties <- str_split(get_acs(geography = "county", variables = "B01001_001E", state=input$state)$NAME, pattern = " County", simplify = T)[,1]
+      updateSelectInput(session, inputId = "county", choices = counties)
+      shinyjs::show("county")
+    }
+  })
+  
+  observeEvent(input$county, {
+    if(input$county != "Select..."){
+      shinyjs::show("municipality")
+    }
   })
   
   ##############################################################################################################
@@ -143,42 +173,23 @@ server <- (function(input, output, session){
     }
   })
   
-  ##############################################################################################################
-  # Download Results
-  ##############################################################################################################
-  output$downloadresults <- downloadHandler(
-    filename = function() {
-      # Use the selected dataset as the suggested file name
-      paste("SToPA Tookit.xlsx", sep="")
-    },
-    content = function(file) {
-      # Write the dataset to the `file` that will be downloaded
-      saveWorkbook(analyzeData(), file,overwrite = TRUE)
-    }
-  )
-  
-  output$downloadresultsZip <- downloadHandler(
-    filename="SToPA Tookit.zip",
-    
-    content = function(file){
-      analyzeData()
 
-      ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
-      ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
-      ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
-      ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
-      ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
-      ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
-      ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
-      ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
-      ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
-      ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
-      saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
-      
-      zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
-    }
-  )
-  
+  observeEvent(input$completeAnalysis, {
+    analyzeData()
+    shinyjs::show("downloadresultsZip")
+    showTab(inputId = "main", target = "Q1")
+    showTab(inputId = "main", target = "Q2")
+    showTab(inputId = "main", target = "Q3")
+    showTab(inputId = "main", target = "Q4")
+    showTab(inputId = "main", target = "Q5")
+    showTab(inputId = "main", target = "Q6")
+    showTab(inputId = "main", target = "Q7")
+    showTab(inputId = "main", target = "Q8")
+    showTab(inputId = "main", target = "Q9")
+    showTab(inputId = "main", target = "Q10")
+    shinyjs::hide("completeAnalysis")
+  })
+
   analyzeData <- function(){
     showModal(modalDialog("Things are happening in the background!", footer=NULL))
     
@@ -414,8 +425,8 @@ server <- (function(input, output, session){
     # Dump raw charges
     policingdata <- policingdata %>%
       select(-input$select_charges) 
-      
-      # Put in nice order
+    
+    # Put in nice order
     policingdata <- policingdata %>%
       relocate(Race, Gender, traffic, arrest, bondamount, druggun, Patrol, Officer, Date, Day, Time, qol) %>%
       as.data.frame %>%
@@ -481,15 +492,14 @@ server <- (function(input, output, session){
       guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
       theme_bw() +
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
     globalVars$p1 <- p
-
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
     
     globalVars$t1 <- qExcel
-      
+    
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
@@ -510,6 +520,12 @@ server <- (function(input, output, session){
     if (chisq$p.value < 0.05) {
       mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
       qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+      globalVars$m1 <- qmessage
+      writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+    }else{
+      mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+      qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+      globalVars$m1 <- qmessage
       writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
     }
     setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
@@ -560,7 +576,6 @@ server <- (function(input, output, session){
       guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
       theme_bw() +
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
     globalVars$p2 <- p
     
@@ -588,6 +603,12 @@ server <- (function(input, output, session){
     if (chisq$p.value < 0.05) {
       mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
       qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+      globalVars$m2 <- qmessage
+      writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+    }else{
+      mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+      qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+      globalVars$m2 <- qmessage
       writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
     }
     setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
@@ -636,7 +657,6 @@ server <- (function(input, output, session){
       guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
       theme_bw() +
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
     globalVars$p3 <- p
     
@@ -664,6 +684,12 @@ server <- (function(input, output, session){
     if (chisq$p.value < 0.05) {
       mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
       qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+      globalVars$m3 <- qmessage
+      writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+    }else{
+      mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+      qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+      globalVars$m3 <- qmessage
       writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
     }
     setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
@@ -712,7 +738,6 @@ server <- (function(input, output, session){
       guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
       theme_bw() +
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
     globalVars$p4 <- p
     
@@ -740,6 +765,12 @@ server <- (function(input, output, session){
     if (chisq$p.value < 0.05) {
       mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
       qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+      globalVars$m4 <- qmessage
+      writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+    } else{
+      mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+      qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+      globalVars$m4 <- qmessage
       writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
     }
     setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
@@ -790,7 +821,6 @@ server <- (function(input, output, session){
       guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
       theme_bw() +
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
     globalVars$p5 <- p
     
@@ -798,7 +828,7 @@ server <- (function(input, output, session){
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
     
     globalVars$t5 <- qExcel
-
+    
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
@@ -818,6 +848,12 @@ server <- (function(input, output, session){
     if (chisq$p.value < 0.05) {
       mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
       qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+      globalVars$m5 <- qmessage
+      writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+    }else{
+      mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+      qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+      globalVars$m5 <- qmessage
       writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
     }
     setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
@@ -843,7 +879,6 @@ server <- (function(input, output, session){
       geom_col(position = position_dodge()) +
       scale_y_continuous(name = "Proportion of Incidents\nResulting in Arrest", limits = c(0,1)) +
       theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
     globalVars$p6 <- p
     
@@ -851,7 +886,7 @@ server <- (function(input, output, session){
       pivot_wider(names_from = c("Gender"), values_from = "proportion") 
     
     globalVars$t6 <- qExcel
-
+    
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
     mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
@@ -878,7 +913,6 @@ server <- (function(input, output, session){
       geom_col(position = position_dodge()) +
       scale_y_continuous(name = "Mean Bond Amount") +
       theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
     globalVars$p7 <- p
     
@@ -911,7 +945,6 @@ server <- (function(input, output, session){
     p <- ggplot() +
       geom_col(data = qdata, aes(x = Patrol, y = proportion, fill = Race)) +
       ylab("Proportion")
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p)
     
     globalVars$p8 <- p
     
@@ -967,7 +1000,6 @@ server <- (function(input, output, session){
       geom_col(data = qdata, aes(x = Officer, y = proportion, fill = Race)) +
       ylab("Proportion") +
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 11, units = "in")
     
     globalVars$p9 <- p
     
@@ -1006,7 +1038,6 @@ server <- (function(input, output, session){
       scale_y_continuous(name = "Incidents") +
       scale_x_discrete(name = "Hour of Day") +
       theme(panel.grid.minor.y = element_blank())
-    ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
     globalVars$p10 <- p
     
@@ -1019,7 +1050,7 @@ server <- (function(input, output, session){
       select(-newSum)
     
     globalVars$t10 <- qExcel
-
+    
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Hour")
     mergeCells(wb, sheet = question, rows = 1, cols = 2:25)
@@ -1033,4 +1064,478 @@ server <- (function(input, output, session){
     globalVars$wb <- wb
     #wb
   }
+  
+  
+  ##############################################################################################################
+  # Download Results
+  ##############################################################################################################    
+  output$downloadresultsZip <- downloadHandler(
+    filename="SToPA Tookit.zip",
+    
+    content = function(file){
+      ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
+      ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
+      ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
+      ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
+      ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
+      ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
+      ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
+      ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
+      ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
+      ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+      saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
+      
+      zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+    }
+  )
+  
+  ##############################################################################
+  ###       Q1         #########################################################
+  ##############################################################################
+  output$Q1_plot <- renderPlot({
+    req(globalVars$p1)
+    print(globalVars$p1)
+  })
+  
+  output$Q1_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q01.", input$Q1_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p1, device = input$Q1_format, width = as.numeric(input$Q1_width),
+             height = as.numeric(input$Q1_height), units = input$Q1_unit
+      )
+    }
+  )
+  
+  output$Q1_tab <- DT::renderDataTable(
+    {
+      globalVars$t1 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q01"
+        ))
+    )
+  )
+  
+  output$Q1_interp <- renderUI({
+    text <- paste("\U2022", globalVars$m1)
+    withMathJax(tags$p(HTML(text)))
+    
+  })
+  
+  ##############################################################################
+  ###       Q2         #########################################################
+  ##############################################################################
+  output$Q2_plot <- renderPlot({
+    req(globalVars$p2)
+    print(globalVars$p2)
+  })
+  
+  output$Q2_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q02.", input$Q2_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p2, device = input$Q2_format, width = as.numeric(input$Q2_width),
+             height = as.numeric(input$Q2_height), units = input$Q2_unit
+      )
+    }
+  )
+  
+  output$Q2_tab <- DT::renderDataTable(
+    {
+      globalVars$t2 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q02"
+        ))
+    )
+  )
+  
+  output$Q2_interp <- renderUI({
+    text <- paste("\U2022", globalVars$m2)
+    withMathJax(tags$p(HTML(text)))
+    
+  })
+  
+  ##############################################################################
+  ###       Q3         #########################################################
+  ##############################################################################
+  output$Q3_plot <- renderPlot({
+    req(globalVars$p3)
+    print(globalVars$p3)
+  })
+  
+  output$Q3_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q03.", input$Q3_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p3, device = input$Q3_format, width = as.numeric(input$Q3_width),
+             height = as.numeric(input$Q3_height), units = input$Q3_unit
+      )
+    }
+  )
+  
+  output$Q3_tab <- DT::renderDataTable(
+    {
+      globalVars$t3 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q03"
+        ))
+    )
+  )
+  
+  output$Q3_interp <- renderUI({
+    text <- paste("\U3033", globalVars$m3)
+    withMathJax(tags$p(HTML(text)))
+    
+  })
+  
+  ##############################################################################
+  ###       Q4         #########################################################
+  ##############################################################################
+  output$Q4_plot <- renderPlot({
+    req(globalVars$p4)
+    print(globalVars$p4)
+  })
+  
+  output$Q4_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q04.", input$Q4_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p4, device = input$Q4_format, width = as.numeric(input$Q4_width),
+             height = as.numeric(input$Q4_height), units = input$Q4_unit
+      )
+    }
+  )
+  
+  output$Q4_tab <- DT::renderDataTable(
+    {
+      globalVars$t4 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q04"
+        ))
+    )
+  )
+  
+  output$Q4_interp <- renderUI({
+    text <- paste("\U4044", globalVars$m4)
+    withMathJax(tags$p(HTML(text)))
+    
+  })
+  
+  ##############################################################################
+  ###       Q5         #########################################################
+  ##############################################################################
+  output$Q5_plot <- renderPlot({
+    req(globalVars$p5)
+    print(globalVars$p5)
+  })
+  
+  output$Q5_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q05.", input$Q5_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p5, device = input$Q5_format, width = as.numeric(input$Q5_width),
+             height = as.numeric(input$Q5_height), units = input$Q5_unit
+      )
+    }
+  )
+  
+  output$Q5_tab <- DT::renderDataTable(
+    {
+      globalVars$t5 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q05"
+        ))
+    )
+  )
+  
+  output$Q5_interp <- renderUI({
+    text <- paste("\U5055", globalVars$m5)
+    withMathJax(tags$p(HTML(text)))
+    
+  })
+  
+  ##############################################################################
+  ###       Q6         #########################################################
+  ##############################################################################
+  output$Q6_plot <- renderPlot({
+    req(globalVars$p6)
+    print(globalVars$p6)
+  })
+  
+  output$Q6_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q06.", input$Q6_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p6, device = input$Q6_format, width = as.numeric(input$Q6_width),
+             height = as.numeric(input$Q6_height), units = input$Q6_unit
+      )
+    }
+  )
+  
+  output$Q6_tab <- DT::renderDataTable(
+    {
+      globalVars$t6 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q06"
+        ))
+    )
+  )
+  
+  ##############################################################################
+  ###       Q7         #########################################################
+  ##############################################################################
+  output$Q7_plot <- renderPlot({
+    req(globalVars$p7)
+    print(globalVars$p7)
+  })
+  
+  output$Q7_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q07.", input$Q7_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p7, device = input$Q7_format, width = as.numeric(input$Q7_width),
+             height = as.numeric(input$Q7_height), units = input$Q7_unit
+      )
+    }
+  )
+  
+  output$Q7_tab <- DT::renderDataTable(
+    {
+      globalVars$t7 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q07"
+        ))
+    )
+  )
+  
+  ##############################################################################
+  ###       Q8         #########################################################
+  ##############################################################################
+  output$Q8_plot <- renderPlot({
+    req(globalVars$p8)
+    print(globalVars$p8)
+  })
+  
+  output$Q8_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q08.", input$Q8_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p8, device = input$Q8_format, width = as.numeric(input$Q8_width),
+             height = as.numeric(input$Q8_height), units = input$Q8_unit
+      )
+    }
+  )
+  
+  output$Q8_tab <- DT::renderDataTable(
+    {
+      globalVars$t8 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q08"
+        ))
+    )
+  )
+  
+  ##############################################################################
+  ###       Q9         #########################################################
+  ##############################################################################
+  output$Q9_plot <- renderPlot({
+    req(globalVars$p9)
+    print(globalVars$p9)
+  })
+  
+  output$Q9_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q09.", input$Q9_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p9, device = input$Q9_format, width = as.numeric(input$Q9_width),
+             height = as.numeric(input$Q9_height), units = input$Q9_unit
+      )
+    }
+  )
+  
+  output$Q9_tab <- DT::renderDataTable(
+    {
+      globalVars$t9 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q09"
+        ))
+    )
+  )
+  
+  ##############################################################################
+  ###       Q10         #########################################################
+  ##############################################################################
+  output$Q10_plot <- renderPlot({
+    req(globalVars$p10)
+    print(globalVars$p10)
+  })
+  
+  output$Q10_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q10.", input$Q10_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p10, device = input$Q10_format, width = as.numeric(input$Q10_width),
+             height = as.numeric(input$Q10_height), units = input$Q10_unit
+      )
+    }
+  )
+  
+  output$Q10_tab <- DT::renderDataTable(
+    {
+      globalVars$t10 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q10"
+        ))
+    )
+  )
 })

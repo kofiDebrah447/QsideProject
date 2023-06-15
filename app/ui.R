@@ -77,7 +77,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                        tabPanel("Analyze Data",
                                 #visualize dataset and display dataset
                                 mainPanel(
-                                  tabsetPanel(id="workPanel",
+                                  tabsetPanel(id="main",
                                               
                                               tabPanel("Data Input", br(), value = "datainput",
                                                        fluidPage(
@@ -244,7 +244,45 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               selected = NULL)
                                                            )
                                                          ),
-                                                         downloadButton("downloadresultsZip", "Download Results"), br(), br(), br()
+                                                         h3("Census API Input"),
+                                                         fluidRow(
+                                                           column(width=4, 
+                                                                  textInput("census_api_key", label = " API Key",  
+                                                                            value = "985901667535f61f5ea97bfbf8e4fdfcd8c743c4",
+                                                                            width = "400px")),
+                                                           column(width=4, 
+                                                                  selectInput("census_year", label = "Year", choices = 2017:2021, selected = 2021)),
+                                                           column(width=4,
+                                                                  selectInput("geolevel", label = "Geography", choices = "tract", selected = "tract"))
+                                                         ),
+                                                         h3("Geographic Input"),
+                                                         fluidRow(
+                                                           column(width=4,selectInput("state", label = "State", 
+                                                                                      choices = c("Select...",
+                                                                                                  "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
+                                                                                                  "DE", "DC", "FL", "GA", "HI", "ID", "IL",
+                                                                                                  "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                                                                                                  "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
+                                                                                                  "NY","NC", "ND", "OH", "OK", "OR", "PA",
+                                                                                                  "PR", "RI", "SC", "SD", "TN", "TX", "UT",
+                                                                                                  "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
+                                                                                      selected = "Select...")),
+                                                           column(width=4, 
+                                                                  selectInput("county", label = "County", 
+                                                                              choices = c("Select..."),
+                                                                              selected = "Select...")),
+                                                           column(width=4, 
+                                                                  # selectInput("municipality", label = " Municipality", 
+                                                                  #             choices = c("Select..."),
+                                                                  #             selected = "Select...")
+                                                                  textInput("municipality", label = "Municipality")
+                                                                  )
+                                                         ),
+                                                         
+                                                         fluidRow(
+                                                           column(width=3, actionButton("completeAnalysis", "Complete Analysis")),
+                                                           column(width=3, downloadButton("downloadresultsZip", "Download Results"))
+                                                         ), br(), br(), br()
                                                        )
                                               ),
                                               
@@ -252,7 +290,194 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                               tabPanel("Data Preview", tags$hr(), value="data",
                                                        verbatimTextOutput("warning"),
                                                        br(),
-                                                       DT::dataTableOutput("preview.data"))
+                                                       DT::dataTableOutput("preview.data")),
+                                              
+                                              
+                                              
+                                              tabPanel("Q1", tags$hr(), value="Q1",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q1_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q1_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q1_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q1_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q1_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q1_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q1_tab")), style="margin-bottom: 30px;"),
+                                                       br(),
+                                                       h1("Interpretation"), 
+                                                       uiOutput("Q1_interp", align="left", style="margin-bottom: 30px;")
+                                              ),
+                                              
+                                              tabPanel("Q2", tags$hr(), value="Q2",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q2_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q2_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q2_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q2_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q2_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q2_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q2_tab")), style="margin-bottom: 30px;"),
+                                                       br(),
+                                                       h1("Interpretation"), 
+                                                       uiOutput("Q2_interp", align="left", style="margin-bottom: 30px;")
+                                              ),
+                                              
+                                              tabPanel("Q3", tags$hr(), value="Q3",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q3_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q3_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q3_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q3_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q3_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q3_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q3_tab")), style="margin-bottom: 30px;"),
+                                                       br(),
+                                                       h1("Interpretation"), 
+                                                       uiOutput("Q3_interp", align="left", style="margin-bottom: 30px;")
+                                              ),
+                                              
+                                              tabPanel("Q4", tags$hr(), value="Q4",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q4_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q4_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q4_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q4_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q4_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q4_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q4_tab")), style="margin-bottom: 30px;"),
+                                                       br(),
+                                                       h1("Interpretation"), 
+                                                       uiOutput("Q4_interp", align="left", style="margin-bottom: 30px;")
+                                              ),
+                                              
+                                              tabPanel("Q5", tags$hr(), value="Q5",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q5_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q5_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q5_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q5_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q5_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q5_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q5_tab")), style="margin-bottom: 30px;"),
+                                                       br(),
+                                                       h1("Interpretation"), 
+                                                       uiOutput("Q5_interp", align="left", style="margin-bottom: 30px;")
+                                              ),
+                                              
+                                              tabPanel("Q6", tags$hr(), value="Q6",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q6_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q6_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q6_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q6_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q6_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q6_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q6_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q7", tags$hr(), value="Q7",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q7_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q7_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q7_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q7_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q7_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q7_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q7_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q8", tags$hr(), value="Q8",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q8_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q8_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q8_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q8_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q8_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q8_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q8_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q9", tags$hr(), value="Q9",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q9_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q9_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q9_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q9_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q9_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q9_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q9_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q10", tags$hr(), value="Q10",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q10_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q10_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q10_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q10_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q10_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q10_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q10_tab")), style="margin-bottom: 30px;"),
+                                              ),
                                   ))
                        )
                        # ,
