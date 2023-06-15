@@ -272,10 +272,9 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               choices = c("Select..."),
                                                                               selected = "Select...")),
                                                            column(width=4, 
-                                                                  # selectInput("municipality", label = " Municipality", 
-                                                                  #             choices = c("Select..."),
-                                                                  #             selected = "Select...")
-                                                                  textInput("municipality", label = "Municipality")
+                                                                  selectInput("municipality", label = " Municipality", 
+                                                                               choices = c("Select..."),
+                                                                               selected = "Select...")
                                                                   )
                                                          ),
                                                          

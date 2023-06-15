@@ -109,15 +109,41 @@ server <- (function(input, output, session){
   
   observeEvent(input$state,{
     if(input$state != "Select..."){
-      census_api_key(input$census_api_key)
-      counties <- str_split(get_acs(geography = "county", variables = "B01001_001E", state=input$state)$NAME, pattern = " County", simplify = T)[,1]
-      updateSelectInput(session, inputId = "county", choices = counties)
-      shinyjs::show("county")
+      tryCatch(
+        expr = {
+          census_api_key(input$census_api_key)
+          counties <- str_split(get_acs(geography = "county", variables = "B01001_001E", state=input$state)$NAME, pattern = " County", simplify = T)[,1]
+          updateSelectInput(session, inputId = "county", choices = c("Select...", counties), selected = "Select...")
+          shinyjs::show("county")
+        },
+        error=function(e){
+          shinyalert("Oops!", "Something went wrong. Check your census api key.", type = "error")
+          updateSelectInput(session, inputId = "county", 
+                            choices = c("Select...",
+                                        "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
+                                        "DE", "DC", "FL", "GA", "HI", "ID", "IL",
+                                        "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                                        "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
+                                        "NY","NC", "ND", "OH", "OK", "OR", "PA",
+                                        "PR", "RI", "SC", "SD", "TN", "TX", "UT",
+                                        "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
+                            selected = "Select...")
+          
+        }
+      )
     }
   })
   
   observeEvent(input$county, {
     if(input$county != "Select..."){
+      municipalities <- read.csv("www/placeList.txt", sep="|") %>%
+        filter(STATE == input$state) %>%
+        filter(grepl(pattern=paste(input$county, "County"), x=COUNTY)) %>%
+        pull(PLACENAME) %>%
+        gsub(pattern="\\s*\\w*$", replacement="")
+      
+      updateSelectInput(session, inputId = "municipality", choices = c("Select...", municipalities), selected = "Select...")
+
       shinyjs::show("municipality")
     }
   })
