@@ -271,7 +271,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                   selectInput("county", label = "County", 
                                                                               choices = c("Select..."),
                                                                               selected = "Select...")),
-                                                           column(width=4, 
+                                                           column(width=4, #https://www2.census.gov/geo/docs/reference/codes/PLACElist.txt
                                                                   selectInput("municipality", label = " Municipality", 
                                                                                choices = c("Select..."),
                                                                                selected = "Select...")
