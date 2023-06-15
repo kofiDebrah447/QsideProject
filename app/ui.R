@@ -21,6 +21,7 @@ library(shinythemes)
 library(shinyAce)
 library(shinyBS)
 library(DT)
+library(zip)
 
 ##########################################
 # General
@@ -37,6 +38,7 @@ library(labelled)
 library(openxlsx)
 library(lubridate)
 library(hms)
+
 
 #--------------------------------------------
 #---------------     UI    ------------------
@@ -242,7 +244,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                               selected = NULL)
                                                            )
                                                          ),
-                                                         downloadButton("downloadresults", "Download Results"), br(), br(), br()
+                                                         downloadButton("downloadresultsZip", "Download Results"), br(), br(), br()
                                                        )
                                               ),
                                               

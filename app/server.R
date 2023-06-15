@@ -157,6 +157,28 @@ server <- (function(input, output, session){
     }
   )
   
+  output$downloadresultsZip <- downloadHandler(
+    filename="SToPA Tookit.zip",
+    
+    content = function(file){
+      analyzeData()
+
+      ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
+      ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
+      ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
+      ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
+      ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
+      ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
+      ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
+      ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
+      ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
+      ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+      saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
+      
+      zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+    }
+  )
+  
   analyzeData <- function(){
     showModal(modalDialog("Things are happening in the background!", footer=NULL))
     
@@ -461,8 +483,13 @@ server <- (function(input, output, session){
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
+    globalVars$p1 <- p
+
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+    
+    globalVars$t1 <- qExcel
+      
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
@@ -535,8 +562,12 @@ server <- (function(input, output, session){
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
+    globalVars$p2 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+    
+    globalVars$t2 <- qExcel
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
@@ -607,8 +638,12 @@ server <- (function(input, output, session){
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
+    globalVars$p3 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+    
+    globalVars$t3 <- qExcel
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
@@ -679,8 +714,12 @@ server <- (function(input, output, session){
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
+    globalVars$p4 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+    
+    globalVars$t4 <- qExcel
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
@@ -753,9 +792,13 @@ server <- (function(input, output, session){
       theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, units = "in")
     
+    globalVars$p5 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
     
+    globalVars$t5 <- qExcel
+
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     deleteData(wb, sheet = question, cols = 1, rows = 2)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
@@ -802,9 +845,13 @@ server <- (function(input, output, session){
       theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
+    globalVars$p6 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender"), values_from = "proportion") 
     
+    globalVars$t6 <- qExcel
+
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
     mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
@@ -821,7 +868,7 @@ server <- (function(input, output, session){
     # Bond amount
     
     qdata <- policingdata %>%
-      group_by(Race, Gender, ) %>%
+      group_by(Race, Gender) %>%
       summarise(meanbond = mean(bondamount, na.rm = TRUE)) %>%
       ungroup %>%
       complete(Race, Gender, fill = list(meanbond = NA))
@@ -833,8 +880,12 @@ server <- (function(input, output, session){
       theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
+    globalVars$p7 <- p
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Gender"), values_from = "meanbond") 
+    
+    globalVars$t7 <- qExcel
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
@@ -862,9 +913,14 @@ server <- (function(input, output, session){
       ylab("Proportion")
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p)
     
+    globalVars$p8 <- p
+    
     qExcel <- qdata %>%
       select(-count) %>%
       pivot_wider(names_from = c("Race"), values_from = "proportion") 
+    
+    globalVars$t8 <- qExcel
+    
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
@@ -913,9 +969,15 @@ server <- (function(input, output, session){
       theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 11, units = "in")
     
+    globalVars$p9 <- p
+    
+    
     qExcel <- qdata %>%
       select(-count) %>%
       pivot_wider(names_from = c("Race"), values_from = "proportion") 
+    
+    globalVars$t9 <- qExcel
+    
     
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
@@ -946,6 +1008,9 @@ server <- (function(input, output, session){
       theme(panel.grid.minor.y = element_blank())
     ggsave(filename = paste0("q", str_pad(question, 2, pad = "0"), ".png"), plot = p, width = 6.5, height = 6.5/1.618, units = "in")
     
+    globalVars$p10 <- p
+    
+    
     qExcel <- qdata %>%
       pivot_wider(names_from = c("Time"), values_from = "count") %>%
       ungroup()%>%
@@ -953,6 +1018,8 @@ server <- (function(input, output, session){
       mutate_if(is.numeric, list(~ ./newSum)) %>% 
       select(-newSum)
     
+    globalVars$t10 <- qExcel
+
     writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
     writeData(wb, sheet = question, startRow = 1, startCol = 2, "Hour")
     mergeCells(wb, sheet = question, rows = 1, cols = 2:25)
@@ -963,7 +1030,7 @@ server <- (function(input, output, session){
     ### SAVE EXCEL SHEET ###
     ########################
     removeModal()
-    wb
+    globalVars$wb <- wb
+    #wb
   }
-  
 })
