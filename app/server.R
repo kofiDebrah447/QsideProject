@@ -5,21 +5,47 @@ server <- (function(input, output, session){
   # Global variables ----
   globalVars <- reactiveValues()
   globalVars$sample <- FALSE
-  shinyjs::hide("downloadresultsZip")
-  hideTab(inputId = "main", target = "Q1")
-  hideTab(inputId = "main", target = "Q2")
-  hideTab(inputId = "main", target = "Q3")
-  hideTab(inputId = "main", target = "Q4")
-  hideTab(inputId = "main", target = "Q5")
-  hideTab(inputId = "main", target = "Q6")
-  hideTab(inputId = "main", target = "Q7")
-  hideTab(inputId = "main", target = "Q8")
-  hideTab(inputId = "main", target = "Q9")
-  hideTab(inputId = "main", target = "Q10")
+  globalVars$clean <- FALSE
+  globalVars$changed <- TRUE
+  
+  updateUI <- function(changed){
+    if(changed){
+      shinyjs::hide("downloadresultsZip")
+      hideTab(inputId = "main", target = "Q1")
+      hideTab(inputId = "main", target = "Q2")
+      hideTab(inputId = "main", target = "Q3")
+      hideTab(inputId = "main", target = "Q4")
+      hideTab(inputId = "main", target = "Q5")
+      hideTab(inputId = "main", target = "Q6")
+      hideTab(inputId = "main", target = "Q7")
+      hideTab(inputId = "main", target = "Q8")
+      hideTab(inputId = "main", target = "Q9")
+      hideTab(inputId = "main", target = "Q10")
+      
+      shinyjs::show("completeAnalysis")
+    }else{
+      shinyjs::show("downloadresultsZip")
+      showTab(inputId = "main", target = "Q1")
+      showTab(inputId = "main", target = "Q2")
+      showTab(inputId = "main", target = "Q3")
+      showTab(inputId = "main", target = "Q4")
+      showTab(inputId = "main", target = "Q5")
+      showTab(inputId = "main", target = "Q6")
+      showTab(inputId = "main", target = "Q7")
+      showTab(inputId = "main", target = "Q8")
+      showTab(inputId = "main", target = "Q9")
+      showTab(inputId = "main", target = "Q10")
+      
+      shinyjs::hide("completeAnalysis")
+    }
+  }
+  
+  
+  updateUI(isolate(globalVars$changed))
   
   shinyjs::hide("county")
   shinyjs::hide("municipality")
-
+  
   
   ##############################################
   # PROCESS UPLOADED DATA
@@ -36,6 +62,8 @@ server <- (function(input, output, session){
     globalVars$dataset <- policingdata %>% mutate_if(is.character,as.factor)
     globalVars$dataset.original <- policingdata %>% mutate_if(is.character,as.factor)
     checkdataANDupdate()
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
   })  
   
   checkdataANDupdate <- function(){
@@ -45,7 +73,7 @@ server <- (function(input, output, session){
     
     if(all(default.column.names %in% colnames(globalVars$dataset))){
       # fill race column select
-      updateSelectInput(session, "select_race_column", choices = c(colnames(globalVars$dataset)), selected = "Race")
+      updateSelectInput(session, "select_race_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Race")
       # fill race selects
       updateSelectInput(session, "select_aian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "AIAN")
       updateSelectInput(session, "select_asian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "Asian")
@@ -57,39 +85,85 @@ server <- (function(input, output, session){
       updateSelectInput(session, "select_notlisted", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
       
       # fill gender column select
-      updateSelectInput(session, "select_gender_column", choices = c(colnames(globalVars$dataset)), selected = "Gender")
+      updateSelectInput(session, "select_gender_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Gender")
       # fill gender selects
-      updateSelectInput(session, "select_man", choices = unique(globalVars$dataset[["Gender"]]), selected = "Man")
-      updateSelectInput(session, "select_woman", choices = unique(globalVars$dataset[["Gender"]]), selected = "Woman")
+      updateSelectInput(session, "select_man", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Man")
+      updateSelectInput(session, "select_woman", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Woman")
       
       # fill charge column selectize
-      updateSelectizeInput(session, "select_charges", choices = c(colnames(globalVars$dataset)), selected = paste0("charge",1:25))
+      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset), selected = paste0("charge",1:25))
       
       # fill arrest column select
-      updateSelectInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = "typeofarrest")
+      updateSelectInput(session, "select_arrest", choices = c("Select...", colnames(globalVars$dataset)), selected = "typeofarrest")
       
       # fill arrest type selectize 
       updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["typeofarrest"]]), selected = c("Taken Into Custody", "Summoned/Cited"))
       
       # fill bond amount column select
-      updateSelectInput(session, "select_bond", choices = c(colnames(globalVars$dataset)), selected = "bondamount")
+      updateSelectInput(session, "select_bond", choices = c("Select...", colnames(globalVars$dataset)), selected = "bondamount")
       
       # fill patrol column select
-      updateSelectInput(session, "select_patrol", choices = c(colnames(globalVars$dataset)), selected = "Patrol")
+      updateSelectInput(session, "select_patrol", choices = c("Select...", colnames(globalVars$dataset)), selected = "Patrol")
       
       # fill arresting officer column select
-      updateSelectInput(session, "select_arrestingofficer", choices = c(colnames(globalVars$dataset)), selected = "Officer")
+      updateSelectInput(session, "select_arrestingofficer", choices = c("Select...", colnames(globalVars$dataset)), selected = "Officer")
       
       # fill date column select
-      updateSelectInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = "datetimeofarrest")
+      updateSelectInput(session, "select_date", choices = c("Select...", colnames(globalVars$dataset)), selected = "datetimeofarrest")
       
       # fill timezone
       updateSelectInput(session, "select_timezone", 
-                        choices = c("US/Central", "US/Eastern", "US/Mountain", 
+                        choices = c("Select...", "US/Central", "US/Eastern", "US/Mountain", 
                                     "US/Pacific", "UTC"),
                         selected = "US/Eastern")
+      globalVars$clean <- TRUE
     }else{
       # update all column inputs to have column names to select
+      # fill race column select
+      updateSelectInput(session, "select_race_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      # fill race selects
+      updateSelectInput(session, "select_aian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_asian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_black", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_hispanic", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_nhpi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_white", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_multi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectInput(session, "select_notlisted", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      
+      # fill gender column select
+      updateSelectInput(session, "select_gender_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      # fill gender selects
+      updateSelectInput(session, "select_man", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Select...")
+      updateSelectInput(session, "select_woman", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Select...")
+      
+      # fill charge column selectize
+      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset))
+      
+      # fill arrest column select
+      updateSelectInput(session, "select_arrest", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      
+      # fill arrest type selectize 
+      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["typeofarrest"]]))
+      
+      # fill bond amount column select
+      updateSelectInput(session, "select_bond", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      
+      # fill patrol column select
+      updateSelectInput(session, "select_patrol", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      
+      # fill arresting officer column select
+      updateSelectInput(session, "select_arrestingofficer", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      
+      # fill date column select
+      updateSelectInput(session, "select_date", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      
+      # fill timezone
+      updateSelectInput(session, "select_timezone", 
+                        choices = c("Select...", "US/Central", "US/Eastern", "US/Mountain", 
+                                    "US/Pacific", "UTC"),
+                        selected = "Select...")
+      globalVars$clean <- FALSE
     }
   }
   
@@ -104,8 +178,117 @@ server <- (function(input, output, session){
   # Change UI based on user 
   ##############################################################################################################
   observe({
-    
+    #IF check that all things are provided
+    #  make complete analysis button enabled
+    #ELSE
+    #  make complete analysis button disabled
   })
+  
+  observeEvent(input$select_asian,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_black,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_hispanic,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_nhpi,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_white,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_multi,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_notlisted,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_gender_column,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_woman,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_man,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_charges,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_arrest,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_arrestTypes,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_bond,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_patrol,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_arrestingofficer,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_date,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$select_timezone,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$census_api_key,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$census_year,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
+  observeEvent(input$geolevel,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+  })
+  
   
   observeEvent(input$state,{
     if(input$state != "Select..."){
@@ -115,6 +298,9 @@ server <- (function(input, output, session){
           counties <- str_split(get_acs(geography = "county", variables = "B01001_001E", state=input$state)$NAME, pattern = " County", simplify = T)[,1]
           updateSelectInput(session, inputId = "county", choices = c("Select...", counties), selected = "Select...")
           shinyjs::show("county")
+          shinyjs::hide("municipality")
+          globalVars$changed <- TRUE
+          updateUI(isolate(globalVars$changed))
         },
         error=function(e){
           shinyalert("Oops!", "Something went wrong. Check your census api key.", type = "error")
@@ -128,9 +314,11 @@ server <- (function(input, output, session){
                                         "PR", "RI", "SC", "SD", "TN", "TX", "UT",
                                         "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
                             selected = "Select...")
-          
         }
       )
+    }else{
+      shinyjs::hide("county")
+      shinyjs::hide("municipality")
     }
   })
   
@@ -143,9 +331,16 @@ server <- (function(input, output, session){
         gsub(pattern="\\s*\\w*$", replacement="")
       
       updateSelectInput(session, inputId = "municipality", choices = c("Select...", municipalities), selected = "Select...")
-
+      
+      globalVars$changed <- TRUE
+      updateUI(isolate(globalVars$changed))
       shinyjs::show("municipality")
     }
+  })
+  
+  observeEvent(input$municipality,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
   })
   
   ##############################################################################################################
@@ -173,6 +368,9 @@ server <- (function(input, output, session){
       globalVars$dataset.original <- policingdata 
       checkdataANDupdate()
       
+      globalVars$changed <- TRUE
+      updateUI(isolate(globalVars$changed))
+      
       updateActionButton(session, "sample", label = "<- Back")
     } else {
       globalVars$sample <- FALSE
@@ -196,26 +394,21 @@ server <- (function(input, output, session){
       globalVars$dataset <- policingdata %>% mutate_if(is.character,as.factor)
       globalVars$dataset.original <- policingdata %>% mutate_if(is.character,as.factor)      
       checkdataANDupdate()
+      globalVars$changed <- TRUE
+      updateUI(isolate(globalVars$changed))
     }
   })
   
-
+  
   observeEvent(input$completeAnalysis, {
-    analyzeData()
-    shinyjs::show("downloadresultsZip")
-    showTab(inputId = "main", target = "Q1")
-    showTab(inputId = "main", target = "Q2")
-    showTab(inputId = "main", target = "Q3")
-    showTab(inputId = "main", target = "Q4")
-    showTab(inputId = "main", target = "Q5")
-    showTab(inputId = "main", target = "Q6")
-    showTab(inputId = "main", target = "Q7")
-    showTab(inputId = "main", target = "Q8")
-    showTab(inputId = "main", target = "Q9")
-    showTab(inputId = "main", target = "Q10")
-    shinyjs::hide("completeAnalysis")
+    if(globalVars$clean){
+      analyzeData() 
+    }else{
+      #cleanData()
+      analyzeData()
+    }
   })
-
+  
   analyzeData <- function(){
     showModal(modalDialog("Things are happening in the background!", footer=NULL))
     
@@ -225,7 +418,7 @@ server <- (function(input, output, session){
         ### User input ###
         ##################
         censusapikey <- input$census_api_key
-        acsyear <- input$census_year
+        acsyear <- as.numeric(input$census_year)
         geolevel <- input$geolevel
         # Note: race x gender not available below tract level
         #       once up and running we can test different geographies
@@ -280,7 +473,7 @@ server <- (function(input, output, session){
         
         acsincome <- get_acs(geography = geolevel,
                              variables = income_vars$name,
-                             year = acsyear,
+                             year =  acsyear,
                              state = state,
                              county = county,
                              geometry = TRUE)
@@ -1090,10 +1283,12 @@ server <- (function(input, output, session){
         ########################
         removeModal()
         globalVars$wb <- wb
+        globalVars$changed <- FALSE
+        updateUI(isolate(globalVars$changed))
       },
       error=function(e){
         removeModal()
-        shinyalert("Oops!", "Something went wrong. Check your census api key and ensure your date and time column is formatted as Month-Day-Year-Hour-Minute compatible.", type = "error")
+        shinyalert("Oops!", "Something went wrong. Check your census api key, and ensure your date and time column is formatted as Month-Day-Year-Hour-Minute compatible.", type = "error")
       }
     )
   }
@@ -1105,20 +1300,39 @@ server <- (function(input, output, session){
   output$downloadresultsZip <- downloadHandler(
     filename="SToPA Tookit.zip",
     
-    content = function(file){
-      ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
-      ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
-      ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
-      ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
-      ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
-      ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
-      ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
-      ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
-      ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
-      ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
-      saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
-      
-      zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+    if(globalVars$clean){
+      content = function(file){
+        ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
+        ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
+        ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
+        ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
+        ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
+        ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
+        ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
+        ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
+        ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
+        ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+        saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
+        
+        zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+      }
+    }else{
+      content = function(file){
+        ggsave('q01.png', plot=globalVars$p1,  width = 6.5, units = "in")
+        ggsave('q02.png', plot=globalVars$p2,  width = 6.5, units = "in")
+        ggsave('q03.png', plot=globalVars$p3,  width = 6.5, units = "in")
+        ggsave('q04.png', plot=globalVars$p4,  width = 6.5, units = "in")
+        ggsave('q05.png', plot=globalVars$p5,  width = 6.5, units = "in")
+        ggsave('q06.png', plot=globalVars$p6,  width = 6.5, units = "in")
+        ggsave('q07.png', plot=globalVars$p7,  width = 6.5, units = "in")
+        ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
+        ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
+        ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+        saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
+        # add cleaned csv
+        
+        zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+      } 
     }
   )
   
