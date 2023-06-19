@@ -1,3 +1,5 @@
+
+
 server <- (function(input, output, session){
   options(scipen = 4)
   options(shiny.maxRequestSize=30*1024^2)
@@ -53,17 +55,20 @@ server <- (function(input, output, session){
   # Process uploaded dataset ----
   upload_data <- reactive({
     req(input$file_upload)
+    showModal(modalDialog("Loading Data", footer=NULL))
     tryCatch({
       policingdata <- read_csv(input$file_upload$datapath)},
       error = function(e){
         stop(safeError(e))      # parsing error
       }
     )
+    
     globalVars$dataset <- policingdata %>% mutate_if(is.character,as.factor)
     globalVars$dataset.original <- policingdata %>% mutate_if(is.character,as.factor)
     checkdataANDupdate()
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    removeModal()
   })  
   
   checkdataANDupdate <- function(){
@@ -73,96 +78,82 @@ server <- (function(input, output, session){
     
     if(all(default.column.names %in% colnames(globalVars$dataset))){
       # fill race column select
-      updateSelectInput(session, "select_race_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Race")
+      
+      updateSelectizeInput(session, "select_race_column", choices = c(colnames(globalVars$dataset)), selected = "Race")
       # fill race selects
-      updateSelectInput(session, "select_aian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "AIAN")
-      updateSelectInput(session, "select_asian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "Asian")
-      updateSelectInput(session, "select_black", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "Black")
-      updateSelectInput(session, "select_hispanic", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_nhpi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_white", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "White")
-      updateSelectInput(session, "select_multi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_notlisted", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectizeInput(session, "select_aian", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("AIAN" %in% as.character(unique(globalVars$dataset[["Race"]])), "AIAN", "Not in the Data"))
+      updateSelectizeInput(session, "select_asian", choices = c("Not in the Data", as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("Asian" %in% as.character(unique(globalVars$dataset[["Race"]])), "Asian", "Not in the Data"))
+      updateSelectizeInput(session, "select_black", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("Black" %in% as.character(unique(globalVars$dataset[["Race"]])), "Black", "Not in the Data"))
+      updateSelectizeInput(session, "select_hispanic", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("Hispanic/Latino" %in% as.character(unique(globalVars$dataset[["Race"]])), "Hispanic/Latino", "Not in the Data"))
+      updateSelectizeInput(session, "select_nhpi", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("NHPI" %in% as.character(unique(globalVars$dataset[["Race"]])), "NHPI", "Not in the Data"))
+      updateSelectizeInput(session, "select_white", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("White" %in% as.character(unique(globalVars$dataset[["Race"]])), "White", "Not in the Data"))
+      updateSelectizeInput(session, "select_multi", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("Multiracial" %in% as.character(unique(globalVars$dataset[["Race"]])), "Multiracial", "Not in the Data"))
+      updateSelectizeInput(session, "select_notlisted", choices = c("Not in the Data",as.character(unique(globalVars$dataset[["Race"]]))), selected = ifelse("A race not listed above" %in% as.character(unique(globalVars$dataset[["Race"]])), "A race not listed above", "Not in the Data"))
       
       # fill gender column select
-      updateSelectInput(session, "select_gender_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Gender")
+      updateSelectizeInput(session, "select_gender_column", choices = c(colnames(globalVars$dataset)), selected = "Gender")
       # fill gender selects
-      updateSelectInput(session, "select_man", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Man")
-      updateSelectInput(session, "select_woman", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Woman")
+      updateSelectizeInput(session, "select_man", choices = c(unique(globalVars$dataset[["Gender"]])), selected = "Man")
+      updateSelectizeInput(session, "select_woman", choices = c(unique(globalVars$dataset[["Gender"]])), selected = "Woman")
       
       # fill charge column selectize
       updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset), selected = paste0("charge",1:25))
       
       # fill arrest column select
-      updateSelectInput(session, "select_arrest", choices = c("Select...", colnames(globalVars$dataset)), selected = "typeofarrest")
+      updateSelectizeInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = "typeofarrest")
       
       # fill arrest type selectize 
       updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["typeofarrest"]]), selected = c("Taken Into Custody", "Summoned/Cited"))
       
       # fill bond amount column select
-      updateSelectInput(session, "select_bond", choices = c("Select...", colnames(globalVars$dataset)), selected = "bondamount")
+      updateSelectizeInput(session, "select_bond", choices = c(colnames(globalVars$dataset)), selected = "bondamount")
       
       # fill patrol column select
-      updateSelectInput(session, "select_patrol", choices = c("Select...", colnames(globalVars$dataset)), selected = "Patrol")
+      updateSelectizeInput(session, "select_patrol", choices = c(colnames(globalVars$dataset)), selected = "Patrol")
       
       # fill arresting officer column select
-      updateSelectInput(session, "select_arrestingofficer", choices = c("Select...", colnames(globalVars$dataset)), selected = "Officer")
+      updateSelectizeInput(session, "select_arrestingofficer", choices = c(colnames(globalVars$dataset)), selected = "Officer")
       
       # fill date column select
-      updateSelectInput(session, "select_date", choices = c("Select...", colnames(globalVars$dataset)), selected = "datetimeofarrest")
+      updateSelectizeInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = "datetimeofarrest")
       
       # fill timezone
-      updateSelectInput(session, "select_timezone", 
-                        choices = c("Select...", "US/Central", "US/Eastern", "US/Mountain", 
-                                    "US/Pacific", "UTC"),
-                        selected = "US/Eastern")
+      updateSelectizeInput(session, "select_timezone", 
+                           choices = c("US/Central", "US/Eastern", "US/Mountain", 
+                                       "US/Pacific", "UTC"),
+                           selected = NULL)
       globalVars$clean <- TRUE
     }else{
       # update all column inputs to have column names to select
       # fill race column select
-      updateSelectInput(session, "select_race_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
-      # fill race selects
-      updateSelectInput(session, "select_aian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_asian", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_black", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_hispanic", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_nhpi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_white", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_multi", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
-      updateSelectInput(session, "select_notlisted", choices = c("NA", as.character(unique(globalVars$dataset[["Race"]]))), selected = "NA")
+      updateSelectizeInput(session, "select_race_column", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill gender column select
-      updateSelectInput(session, "select_gender_column", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
-      # fill gender selects
-      updateSelectInput(session, "select_man", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Select...")
-      updateSelectInput(session, "select_woman", choices = c("Select...", unique(globalVars$dataset[["Gender"]])), selected = "Select...")
+      updateSelectizeInput(session, "select_gender_column", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill charge column selectize
-      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset))
+      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset), selected = NULL)
       
       # fill arrest column select
-      updateSelectInput(session, "select_arrest", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
-      
-      # fill arrest type selectize 
-      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["typeofarrest"]]))
+      updateSelectizeInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill bond amount column select
-      updateSelectInput(session, "select_bond", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      updateSelectizeInput(session, "select_bond", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill patrol column select
-      updateSelectInput(session, "select_patrol", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      updateSelectizeInput(session, "select_patrol", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill arresting officer column select
-      updateSelectInput(session, "select_arrestingofficer", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      updateSelectizeInput(session, "select_arrestingofficer", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill date column select
-      updateSelectInput(session, "select_date", choices = c("Select...", colnames(globalVars$dataset)), selected = "Select...")
+      updateSelectizeInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = NULL)
       
       # fill timezone
-      updateSelectInput(session, "select_timezone", 
-                        choices = c("Select...", "US/Central", "US/Eastern", "US/Mountain", 
-                                    "US/Pacific", "UTC"),
-                        selected = "Select...")
+      updateSelectizeInput(session, "select_timezone", 
+                           choices = c("US/Central", "US/Eastern", "US/Mountain", 
+                                       "US/Pacific", "UTC"),
+                           selected = NULL)
       globalVars$clean <- FALSE
     }
   }
@@ -184,64 +175,303 @@ server <- (function(input, output, session){
     #  make complete analysis button disabled
   })
   
+  observeEvent(input$select_race_column,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_asian", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_black", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_hispanic", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_nhpi", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_white", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_multi", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    updateSelectizeInput(session, "select_notlisted", choices = c("Not in the Data", as.character(unique(globalVars$dataset[[input$select_race_column]]))), selected = "Not in the Data")
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_race_column))
+    # fill race column select
+    #updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+  })
+  
+  observeEvent(input$select_aian,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    #updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
+  })
+  
+  
   observeEvent(input$select_asian,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    #updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_black,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    #updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_hispanic,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    #updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_nhpi,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    #updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_white,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    #updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_multi,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    #updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_notlisted,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c("Not in the Data", setdiff(as.character(unique(globalVars$dataset[[input$select_race_column]])), 
+                                           c(input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted)))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_aian", choices = c(input$select_aian, otherselects), selected = input$select_aian)
+    updateSelectizeInput(session, "select_asian", choices = c(input$select_asian, otherselects), selected = input$select_asian)
+    updateSelectizeInput(session, "select_black", choices = c(input$select_black, otherselects), selected = input$select_black)
+    updateSelectizeInput(session, "select_hispanic", choices = c(input$select_hispanic, otherselects), selected = input$select_hispanic)
+    updateSelectizeInput(session, "select_nhpi", choices = c(input$select_nhpi, otherselects), selected = input$select_nhpi)
+    updateSelectizeInput(session, "select_white", choices = c(input$select_white, otherselects), selected = input$select_white)
+    updateSelectizeInput(session, "select_multi", choices = c(input$select_multi, otherselects), selected = input$select_multi)
+    #updateSelectizeInput(session, "select_notlisted", choices = c(input$select_notlisted, otherselects), selected = input$select_notlisted)
   })
   
   observeEvent(input$select_gender_column,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # fill gender selects
+    updateSelectizeInput(session, "select_man", choices = c(as.character(unique(globalVars$dataset[[input$select_gender_column]]))), selected = NULL)
+    updateSelectizeInput(session, "select_woman", choices = c(as.character(unique(globalVars$dataset[[input$select_gender_column]]))), selected = NULL)
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_gender_column))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    #updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_woman,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(as.character(unique(globalVars$dataset[[input$select_gender_column]])),input$select_woman))
+    
+    # fill race selects
+    #updateSelectizeInput(session, "select_woman", choices = otherselects)
+    updateSelectizeInput(session, "select_man", choices = otherselects, selected=input$select_man)
   })
   
   observeEvent(input$select_man,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(as.character(unique(globalVars$dataset[[input$select_gender_column]])),input$select_man))
+    
+    # fill race selects
+    updateSelectizeInput(session, "select_woman", choices = otherselects, selected = input$select_woman)
+    #updateSelectizeInput(session, "select_man", choices = otherselects)
   })
   
   observeEvent(input$select_charges,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_charges))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    #updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_arrest,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # fill arrest type selectize 
+    updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[[input$select_arrest]]))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_charges))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    #updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_arrestTypes,{
@@ -252,21 +482,97 @@ server <- (function(input, output, session){
   observeEvent(input$select_bond,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_bond))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    #updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_patrol,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_patrol))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    #updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_arrestingofficer,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_arrestingofficer))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    #updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_date,{
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_date))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, setdiff(otherselects, "Select...")), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    #updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
   })
   
   observeEvent(input$select_timezone,{
@@ -296,7 +602,7 @@ server <- (function(input, output, session){
         expr = {
           census_api_key(input$census_api_key)
           counties <- str_split(get_acs(geography = "county", variables = "B01001_001E", state=input$state)$NAME, pattern = " County", simplify = T)[,1]
-          updateSelectInput(session, inputId = "county", choices = c("Select...", counties), selected = "Select...")
+          updateSelectizeInput(session, inputId = "county", choices = c(counties), selected = "Select...")
           shinyjs::show("county")
           shinyjs::hide("municipality")
           globalVars$changed <- TRUE
@@ -304,16 +610,16 @@ server <- (function(input, output, session){
         },
         error=function(e){
           shinyalert("Oops!", "Something went wrong. Check your census api key.", type = "error")
-          updateSelectInput(session, inputId = "county", 
-                            choices = c("Select...",
-                                        "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
-                                        "DE", "DC", "FL", "GA", "HI", "ID", "IL",
-                                        "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-                                        "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
-                                        "NY","NC", "ND", "OH", "OK", "OR", "PA",
-                                        "PR", "RI", "SC", "SD", "TN", "TX", "UT",
-                                        "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
-                            selected = "Select...")
+          updateSelectizeInput(session, inputId = "county", 
+                               choices = c("Select...",
+                                           "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
+                                           "DE", "DC", "FL", "GA", "HI", "ID", "IL",
+                                           "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                                           "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
+                                           "NY","NC", "ND", "OH", "OK", "OR", "PA",
+                                           "PR", "RI", "SC", "SD", "TN", "TX", "UT",
+                                           "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
+                               selected = "Select...")
         }
       )
     }else{
@@ -330,7 +636,7 @@ server <- (function(input, output, session){
         pull(PLACENAME) %>%
         gsub(pattern="\\s*\\w*$", replacement="")
       
-      updateSelectInput(session, inputId = "municipality", choices = c("Select...", municipalities), selected = "Select...")
+      updateSelectizeInput(session, inputId = "municipality", choices = c(municipalities), selected = "Select...")
       
       globalVars$changed <- TRUE
       updateUI(isolate(globalVars$changed))
@@ -391,6 +697,7 @@ server <- (function(input, output, session){
       if(input$sample_data_choice=="Durham NC"){
         policingdata <- read_csv("www/durhamdata.csv")
       }
+      
       globalVars$dataset <- policingdata %>% mutate_if(is.character,as.factor)
       globalVars$dataset.original <- policingdata %>% mutate_if(is.character,as.factor)      
       checkdataANDupdate()
@@ -404,13 +711,131 @@ server <- (function(input, output, session){
     if(globalVars$clean){
       analyzeData() 
     }else{
-      #cleanData()
+      cleanData()
       analyzeData()
     }
   })
   
+  cleanData <- function(){
+    showModal(modalDialog("Cleaning the Data!", footer=NULL))
+
+    policingdata <- globalVars$dataset
+    
+    # Race
+    racecolumn <- ifelse(input$select_race_column=="Not in the Data", NA, input$select_race_column)
+    americanindianalaskanativecode <- ifelse(input$select_aian=="Not in the Data", NA, input$select_aian)
+    asiancode <- ifelse(input$select_asian=="Not in the Data", NA, input$select_asian)
+    blackcode <- ifelse(input$select_black=="Not in the Data", NA, input$select_black)
+    hispaniclatinocode <- ifelse(input$select_hispanic=="Not in the Data", NA, input$select_hispanic)
+    nativehawaiianpacificislandercode <- ifelse(input$select_nhpi=="Not in the Data" , NA, input$select_nhpi)
+    whitecode <- ifelse(input$select_white=="Not in the Data", NA, input$select_white)
+    multiracialcode <- ifelse(input$select_multi=="Not in the Data", NA, input$select_multi)
+    notlistedcode <- ifelse(input$select_notlisted=="Not in the Data", NA, input$select_notlisted)
+    
+    # Gender
+    gendercolumn <- input$select_gender_column
+    womancode <- input$select_woman
+    mancode <- input$select_man
+    
+    # Charge
+    chargecolumns <- input$select_charges
+    
+    # Type of arrest
+    typeofarrestcolumn <- input$select_arrest
+    actualarresttypes <- input$select_arrestTypes
+    
+    # Bond amount column
+    bondamountcolumn <- input$select_bond
+    
+    # Patrolling geo unit
+    patrolcolumn <- input$select_patrol
+    
+    # Officer
+    officercolumn <- input$select_arrestingofficer
+    
+    # Date and time
+    datetimecolumn <- input$select_date
+    timezone <- input$select_timezone
+    
+    #################################
+    ### Tidy up policing data set ###
+    #################################
+    # Set columns to keep
+    keeps <- c(racecolumn, gendercolumn, chargecolumns, typeofarrestcolumn , bondamountcolumn, patrolcolumn, officercolumn, datetimecolumn)
+    
+    # Load data
+    policingdata <- policingdata %>%
+      select(all_of(keeps))
+    
+    # Recode race data
+    policingdata <- policingdata %>%
+      rename(Race = !!racecolumn) %>%
+      mutate(Race = dplyr::case_match(Race,
+                                      americanindianalaskanativecode ~ "AIAN",
+                                      asiancode ~ "Asian",
+                                      blackcode ~ "Black",
+                                      hispaniclatinocode ~ "Hispanic/Latino",
+                                      nativehawaiianpacificislandercode ~ "NHPI",
+                                      whitecode ~ "White",
+                                      multiracialcode ~ "Multiracial",
+                                      notlistedcode ~ "A race not listed above",
+                                      .default = "Missing race data")) %>%
+      mutate(Race = factor(Race, levels = c("AIAN",
+                                            "Asian",
+                                            "Black",
+                                            "Hispanic/Latino",
+                                            "NHPI",
+                                            "White",
+                                            "Multiracial",
+                                            "A race not listed above",
+                                            "Missing race data")))
+    
+    # Recode gender data
+    policingdata <- policingdata %>%
+      rename(Gender = !!gendercolumn) %>%
+      mutate(Gender = case_match(Gender,
+                                 mancode ~ "Man",
+                                 womancode ~ "Woman",
+                                 .default = "Missing gender data")) %>%
+      mutate(Gender = factor(Gender, levels = c("Man", "Woman", "Missing gender data")))
+    
+    
+    # Type of arrest
+    policingdata <- policingdata %>%
+      rename(typeofarrest = !!typeofarrestcolumn) %>%
+      mutate(typeofarrest = str_to_title(typeofarrest)) %>%
+      mutate(typeofarrest = replace(typeofarrest, is.na(typeofarrest), "Missing arrest type data")) %>%
+      mutate(typeofarrest = factor(typeofarrest, levels = c(unique(typeofarrest), "Missing arrest type data")))
+    
+    # Bond amount
+    policingdata <- policingdata %>%
+      rename(bondamount = !!bondamountcolumn) %>%
+      mutate(bondamount = str_replace_all(bondamount, "(\\$|\\,)", "")) %>%
+      mutate(bondamount = as.numeric(bondamount))
+    
+    # Organize patrol geo units
+    policingdata <- policingdata %>%
+      rename(Patrol = !!patrolcolumn) %>%
+      mutate(Patrol = factor(Patrol))
+    
+    # Organize officers
+    policingdata <- policingdata %>%
+      rename(Officer = !!officercolumn) %>%
+      mutate(Officer = factor(Officer))
+    
+    # Put in nice order
+    policingdata <- policingdata %>%
+      relocate(Race, Gender, typeofarrest, bondamount, Patrol, Officer, datetimeofarrest, paste0("charge",1:25)) %>%
+      as.data.frame %>%
+      remove_attributes("spec")
+    
+    globalVars$cleandata <- policingdata
+    
+    removeModal()
+  }
+  
   analyzeData <- function(){
-    showModal(modalDialog("Things are happening in the background!", footer=NULL))
+    showModal(modalDialog("Completing the Analyses!", footer=NULL))
     
     tryCatch(
       expr = {
@@ -552,7 +977,13 @@ server <- (function(input, output, session){
         #################################
         ### Tidy up policing data set ###
         #################################
-        policingdata <- globalVars$dataset %>%
+        if(globalVars$clean){
+          policingdata <- globalVars$dataset
+        }else{
+          policingdata <- globalVars$cleandata
+        }
+        
+        policingdata <- policingdata %>%
           # Fix Race
           mutate(Race = case_when(is.na(Race) ~ NA_character_,
                                   TRUE        ~ Race)) %>%
@@ -1329,8 +1760,7 @@ server <- (function(input, output, session){
         ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
         ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
         saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
-        # add cleaned csv
-        
+        write.csv(x = globalVars$cleandata, file = "CleanedInputFile.csv")
         zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
       } 
     }

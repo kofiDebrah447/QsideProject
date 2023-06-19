@@ -91,84 +91,96 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                          h3("Racial Variables"),
                                                          fluidRow(
                                                            column(width=3,
-                                                                  selectInput("select_race_column",
-                                                                              "Race Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_race_column",
+                                                                                 "Race Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          fluidRow(
                                                            column(width=3,
-                                                                  selectInput("select_aian",
-                                                                              "Am. Indian/Alaska Native Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_aian",
+                                                                                 "Am. Indian/Alaska Native Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_asian",
-                                                                              "Asian Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_asian",
+                                                                                 "Asian Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_black",
-                                                                              "Black / African American Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_black",
+                                                                                 "Black / African American Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3,
-                                                                  selectInput("select_hispanic",
-                                                                              "Hispanic / LatinX Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_hispanic",
+                                                                                 "Hispanic / LatinX Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            br(),
                                                            column(width=3,
-                                                                  selectInput("select_nhpi",
-                                                                              "Native Hawaiin / Pacific Islander",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_nhpi",
+                                                                                 "Native Hawaiin / Pacific Islander",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_white",
-                                                                              "White",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_white",
+                                                                                 "White",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_multi",
-                                                                              "Multiracial Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_multi",
+                                                                                 "Multiracial Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_notlisted",
-                                                                              "Another Racial Category Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_notlisted",
+                                                                                 "Another Racial Category Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          h3("Gender Variables"),
                                                          fluidRow(
                                                            column(width=3, 
-                                                                  selectInput("select_gender_column",
-                                                                              "Gender Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_gender_column",
+                                                                                 "Gender Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          fluidRow(
                                                            column(width=3, 
-                                                                  selectInput("select_woman",
-                                                                              "Woman Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_woman",
+                                                                                 "Woman Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3, 
-                                                                  selectInput("select_man",
-                                                                              "Man Code",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_man",
+                                                                                 "Man Code",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          fluidRow(
@@ -188,10 +200,11 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  multiple = TRUE)
                                                            ),
                                                            column(width=4,
-                                                                  selectInput("select_arrest",
-                                                                              "Arrest Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_arrest",
+                                                                                 "Arrest Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=4,
                                                                   selectizeInput("select_arrestTypes",
@@ -211,37 +224,42 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                          ),
                                                          fluidRow(
                                                            column(width=4,
-                                                                  selectInput("select_bond",
-                                                                              "Bond Amount Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_bond",
+                                                                                 "Bond Amount Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=4,
-                                                                  selectInput("select_patrol",
-                                                                              "Patrol Unit Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_patrol",
+                                                                                 "Patrol Unit Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=4,
-                                                                  selectInput("select_arrestingofficer",
-                                                                              "Arresting Officer Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_arrestingofficer",
+                                                                                 "Arresting Officer Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          h3("Date and Time"),
                                                          fluidRow(
                                                            column(width=3,
-                                                                  selectInput("select_date",
-                                                                              "Date Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_date",
+                                                                                 "Date Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            ),
                                                            column(width=3,
-                                                                  selectInput("select_timezone",
-                                                                              "Time Zone Column",
-                                                                              choices = NULL,
-                                                                              selected = NULL)
+                                                                  selectizeInput("select_timezone",
+                                                                                 "Time Zone Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
                                                            )
                                                          ),
                                                          h3("Census API Input"),
@@ -251,37 +269,40 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                             value = "985901667535f61f5ea97bfbf8e4fdfcd8c743c4",
                                                                             width = "400px")),
                                                            column(width=4, 
-                                                                  selectInput("census_year", label = "Year", choices = 2017:2021, selected = 2021)),
+                                                                  selectizeInput("census_year", label = "Year", choices = 2017:2021, selected = 2021,
+                                                                                 multiple = FALSE)),
                                                            column(width=4,
-                                                                  selectInput("geolevel", label = "Geography", choices = "tract", selected = "tract"))
+                                                                  selectizeInput("geolevel", label = "Geography", choices = "tract", selected = "tract"), multiple=FALSE)
                                                          ),
                                                          h3("Geographic Input"),
                                                          fluidRow(
-                                                           column(width=4,selectInput("state", label = "State", 
-                                                                                      choices = c("Select...",
-                                                                                                  "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
-                                                                                                  "DE", "DC", "FL", "GA", "HI", "ID", "IL",
-                                                                                                  "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-                                                                                                  "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
-                                                                                                  "NY","NC", "ND", "OH", "OK", "OR", "PA",
-                                                                                                  "PR", "RI", "SC", "SD", "TN", "TX", "UT",
-                                                                                                  "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
-                                                                                      selected = "Select...")),
+                                                           column(width=4,selectizeInput("state", label = "State", 
+                                                                                         choices = c("AL", "AK", "AZ", "AR", "CA", "CO", "CT",
+                                                                                                     "DE", "DC", "FL", "GA", "HI", "ID", "IL",
+                                                                                                     "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+                                                                                                     "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
+                                                                                                     "NY","NC", "ND", "OH", "OK", "OR", "PA",
+                                                                                                     "PR", "RI", "SC", "SD", "TN", "TX", "UT",
+                                                                                                     "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
+                                                                                         selected = NULL,
+                                                                                         multiple = FALSE)),
                                                            column(width=4, 
-                                                                  selectInput("county", label = "County", 
-                                                                              choices = c("Select..."),
-                                                                              selected = "Select...")),
+                                                                  selectizeInput("county", label = "County", 
+                                                                                 choices = NULL,
+                                                                                 selected = NULL),
+                                                                  multiple = FALSE),
                                                            column(width=4, #https://www2.census.gov/geo/docs/reference/codes/PLACElist.txt
-                                                                  selectInput("municipality", label = " Municipality", 
-                                                                               choices = c("Select..."),
-                                                                               selected = "Select...")
-                                                                  )
+                                                                  selectizeInput("municipality", label = " Municipality", 
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE)
+                                                           )
                                                          ),
                                                          
                                                          fluidRow(
                                                            column(width=3, actionButton("completeAnalysis", "Complete Analysis")),
                                                            column(width=3, downloadButton("downloadresultsZip", "Download Results"))
-                                                         ), br(), br(), br()
+                                                         ), br(), br(), br(), br(), br(), br(), br(), br()
                                                        )
                                               ),
                                               
