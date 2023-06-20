@@ -526,13 +526,12 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                          shinycssloaders::withSpinner(DT::dataTableOutput("Q10_tab")), style="margin-bottom: 30px;"),
                                               ),
                                   ))
+                       ),
+                       tabPanel("References",
+                                fluidPage(
+                                  includeHTML("www/livebib.html"), br(), br(), br(), br(), br()
+                                )
                        )
-                       # ,
-                       # tabPanel("References",
-                       #          fluidPage(
-                       #            includeHTML("www/livebib.html")
-                       #          )
-                       # )
             )
 )
 
