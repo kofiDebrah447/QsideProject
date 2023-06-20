@@ -95,7 +95,8 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Race Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            )
                                                          ),
                                                          fluidRow(
@@ -104,28 +105,32 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Am. Indian/Alaska Native Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
-                                                           ),
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
+                                                                  ),
                                                            column(width=3, 
                                                                   selectizeInput("select_asian",
                                                                                  "Asian Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3, 
                                                                   selectizeInput("select_black",
                                                                                  "Black / African American Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3,
                                                                   selectizeInput("select_hispanic",
                                                                                  "Hispanic / LatinX Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            br(),
                                                            column(width=3,
@@ -133,28 +138,32 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Native Hawaiin / Pacific Islander",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3, 
                                                                   selectizeInput("select_white",
                                                                                  "White",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3, 
                                                                   selectizeInput("select_multi",
                                                                                  "Multiracial Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3, 
                                                                   selectizeInput("select_notlisted",
                                                                                  "Another Racial Category Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            )
                                                          ),
                                                          h3("Gender Variables"),
@@ -164,7 +173,8 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Gender Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            )
                                                          ),
                                                          fluidRow(
@@ -173,14 +183,16 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Woman Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            ),
                                                            column(width=3, 
                                                                   selectizeInput("select_man",
                                                                                  "Man Code",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Code"))
                                                            )
                                                          ),
                                                          fluidRow(
@@ -197,21 +209,24 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Select Charge Column(s)",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = TRUE)
+                                                                                 multiple = TRUE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            ),
                                                            column(width=4,
                                                                   selectizeInput("select_arrest",
                                                                                  "Arrest Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            ),
                                                            column(width=4,
                                                                   selectizeInput("select_arrestTypes",
                                                                                  "Select Arrest Type(s)",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = TRUE)
+                                                                                 multiple = TRUE,
+                                                                                 options = list(placeholder = "Select Codes"))
                                                            )
                                                          ),
                                                          fluidRow(
@@ -228,21 +243,24 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Bond Amount Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            ),
                                                            column(width=4,
                                                                   selectizeInput("select_patrol",
                                                                                  "Patrol Unit Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            ),
                                                            column(width=4,
                                                                   selectizeInput("select_arrestingofficer",
                                                                                  "Arresting Officer Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            )
                                                          ),
                                                          h3("Date and Time"),
@@ -252,14 +270,16 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  "Date Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
                                                            ),
                                                            column(width=3,
                                                                   selectizeInput("select_timezone",
                                                                                  "Time Zone Column",
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Time Zone"))
                                                            )
                                                          ),
                                                          h3("Census API Input"),
@@ -270,32 +290,39 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                             width = "400px")),
                                                            column(width=4, 
                                                                   selectizeInput("census_year", label = "Year", choices = 2017:2021, selected = 2021,
-                                                                                 multiple = FALSE)),
+                                                                                 multiple = FALSE, 
+                                                                                 options = list(placeholder = "Select a Year"))
+                                                           ),
                                                            column(width=4,
                                                                   selectizeInput("geolevel", label = "Geography", choices = "tract", selected = "tract"), multiple=FALSE)
                                                          ),
                                                          h3("Geographic Input"),
                                                          fluidRow(
                                                            column(width=4,selectizeInput("state", label = "State", 
-                                                                                         choices = c("AL", "AK", "AZ", "AR", "CA", "CO", "CT",
+                                                                                         choices = c("", "AL", "AK", "AZ", "AR", "CA", "CO", "CT",
                                                                                                      "DE", "DC", "FL", "GA", "HI", "ID", "IL",
                                                                                                      "IN", "IA", "KS", "KY", "LA", "ME", "MD",
                                                                                                      "MO", "MT", "NE", "NV", "NH", "NJ", "NM",
                                                                                                      "NY","NC", "ND", "OH", "OK", "OR", "PA",
                                                                                                      "PR", "RI", "SC", "SD", "TN", "TX", "UT",
                                                                                                      "VT", "VA", "VI", "WA", "WV", "WI", "WY"),
-                                                                                         selected = NULL,
-                                                                                         multiple = FALSE)),
+                                                                                         selected = "",
+                                                                                         multiple = FALSE,
+                                                                                         options = list(placeholder = "Select a State"))
+                                                           ),
                                                            column(width=4, 
                                                                   selectizeInput("county", label = "County", 
                                                                                  choices = NULL,
-                                                                                 selected = NULL),
-                                                                  multiple = FALSE),
+                                                                                 selected = NULL,
+                                                                                 multiple=FALSE,
+                                                                                 options = list(placeholder = "Select a County"))
+                                                                  ),
                                                            column(width=4, #https://www2.census.gov/geo/docs/reference/codes/PLACElist.txt
                                                                   selectizeInput("municipality", label = " Municipality", 
                                                                                  choices = NULL,
                                                                                  selected = NULL,
-                                                                                 multiple = FALSE)
+                                                                                 multiple = FALSE ,
+                                                                                 options = list(placeholder = "Municipality"))
                                                            )
                                                          ),
                                                          
