@@ -72,9 +72,9 @@ server <- (function(input, output, session){
   })  
   
   checkdataANDupdate <- function(){
-    default.column.names <- c("Race", "Gender", paste0("charge",1:25),
-                              "typeofarrest", "bondamount", "Patrol",
-                              "Officer",  "datetimeofarrest")
+    default.column.names <- c("Race", "Gender", "_SELECTED_CHARGE_1",
+                              "Arrest", "BondAmount", "Patrol",
+                              "Officer",  "DateTime", "TimeZone")
     
     if(all(default.column.names %in% colnames(globalVars$dataset))){
       # fill race column select
@@ -99,16 +99,17 @@ server <- (function(input, output, session){
       
     
       # fill charge column selectize
-      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset), selected = paste0("charge",1:25))
+      charges <- grep(x = colnames(globalVars$dataset), pattern = "_SELECTED_CHARGE_", value = TRUE)
+      updateSelectizeInput(session, "select_charges", choices = colnames(globalVars$dataset), selected = charges)
       
       # fill arrest column select
-      updateSelectizeInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = "typeofarrest")
+      updateSelectizeInput(session, "select_arrest", choices = c(colnames(globalVars$dataset)), selected = "Arrest")
       
       # fill arrest type selectize 
-      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["typeofarrest"]]), selected = "")
+      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[["Arrest"]]), selected = "TRUE")
       
       # fill bond amount column select
-      updateSelectizeInput(session, "select_bond", choices = c(colnames(globalVars$dataset)), selected = "bondamount")
+      updateSelectizeInput(session, "select_bond", choices = c(colnames(globalVars$dataset)), selected = "BondAmount")
       
       # fill patrol column select
       updateSelectizeInput(session, "select_patrol", choices = c(colnames(globalVars$dataset)), selected = "Patrol")
@@ -117,13 +118,13 @@ server <- (function(input, output, session){
       updateSelectizeInput(session, "select_arrestingofficer", choices = c(colnames(globalVars$dataset)), selected = "Officer")
       
       # fill date column select
-      updateSelectizeInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = "datetimeofarrest")
+      updateSelectizeInput(session, "select_date", choices = c(colnames(globalVars$dataset)), selected = "DateTime")
       
       # fill timezone
       updateSelectizeInput(session, "select_timezone", 
                            choices = c("","US/Central", "US/Eastern", "US/Mountain", 
                                        "US/Pacific", "UTC"),
-                           selected = "")
+                           selected = unique(globalVars$dataset[["TimeZone"]]))
       globalVars$clean <- TRUE
     }else{
       # update all column inputs to have column names to select
@@ -453,7 +454,12 @@ server <- (function(input, output, session){
     updateUI(isolate(globalVars$changed))
     
     # fill arrest type selectize 
-    updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[[input$select_arrest]]))
+    
+    if(globalVars$clean){
+      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[[input$select_arrest]]), selected="TRUE")
+    }else{
+      updateSelectizeInput(session, "select_arrestTypes", choices = unique(globalVars$dataset[[input$select_arrest]]))
+    }
     
     # update all column inputs to have column names to select
     otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_charges))
@@ -845,6 +851,10 @@ server <- (function(input, output, session){
                                  .default = "Missing gender data")) %>%
       mutate(Gender = factor(Gender, levels = c("Man", "Woman", "Missing gender data")))
     
+    # Rename charges columns
+    charge.columns.index <- which(colnames(policingdata)%in%input$select_charges)
+    charge.columns.n <- length(charge.columns.index)
+    colnames(policingdata)[charge.columns.index] <- paste("_SELECTED_CHARGE_", 1:charge.columns.n, sep="")
     
     # Type of arrest
     policingdata <- policingdata %>%
@@ -853,11 +863,16 @@ server <- (function(input, output, session){
       mutate(typeofarrest = replace(typeofarrest, is.na(typeofarrest), "Missing arrest type data")) %>%
       mutate(typeofarrest = factor(typeofarrest, levels = c(unique(typeofarrest), "Missing arrest type data")))
     
+    # Type of arrest
+    policingdata <- policingdata %>%
+      mutate(Arrest = typeofarrest %in% str_to_title(input$select_arrestTypes)) %>%
+      select(-typeofarrest)
+    
     # Bond amount
     policingdata <- policingdata %>%
-      rename(bondamount = !!bondamountcolumn) %>%
-      mutate(bondamount = str_replace_all(bondamount, "(\\$|\\,)", "")) %>%
-      mutate(bondamount = as.numeric(bondamount))
+      rename(BondAmount = !!bondamountcolumn) %>%
+      mutate(BondAmount = str_replace_all(BondAmount, "(\\$|\\,)", "")) %>%
+      mutate(BondAmount = as.numeric(BondAmount))
     
     # Organize patrol geo units
     policingdata <- policingdata %>%
@@ -869,9 +884,14 @@ server <- (function(input, output, session){
       rename(Officer = !!officercolumn) %>%
       mutate(Officer = factor(Officer))
     
+   # Rename Dates
+    policingdata <- policingdata %>%
+      rename(DateTime = !!datetimecolumn) %>%
+      mutate(TimeZone = input$select_timezone)
+    
     # Put in nice order
     policingdata <- policingdata %>%
-      relocate(Race, Gender, typeofarrest, bondamount, Patrol, Officer, datetimeofarrest, paste0("charge",1:25)) %>%
+      relocate(Race, Gender, Arrest, BondAmount, Patrol, Officer, DateTime, starts_with("_SELECTED_CHARGE_")) %>%
       as.data.frame %>%
       remove_attributes("spec")
     
@@ -1043,7 +1063,8 @@ server <- (function(input, output, session){
         
         # Make list of all possible charges
         chargelist <- policingdata %>%
-          select(input$select_charges) %>%
+          select(starts_with("_SELECTED_CHARGE_"))%>%
+          #select(input$select_charges) %>%
           unlist %>%
           unname %>%
           unique %>%
@@ -1062,17 +1083,13 @@ server <- (function(input, output, session){
           pull(charge)%>%
           paste0(collapse = "|")
         tmp <- policingdata %>%
-          select(all_of(input$select_charges))
+          select(starts_with("_SELECTED_CHARGE_"))
+          #select(all_of(input$select_charges))
         tmp[] <- tmp %>%
           lapply(function(x) str_detect(x, regex(trafficcharges, ignore_case = TRUE)))
         policingdata <- policingdata %>%
           mutate(traffic = apply(tmp, 1, function(x) any(x, na.rm = TRUE)))
-        
-        # Type of arrest
-        policingdata <- policingdata %>%
-          mutate(arrest = typeofarrest %in% str_to_title(input$select_arrestTypes)) %>%
-          select(-typeofarrest)
-        
+
         # Identify firearms/drug possession
         # May eventually need user input to identify relevant charges
         druggunwords <- c("firearm", "possess control", "possess cs", "substance", "weapon") %>%
@@ -1085,7 +1102,8 @@ server <- (function(input, output, session){
           pull(charge) %>%
           paste0(collapse = "|")
         tmp <- policingdata %>%
-          select(all_of(input$select_charges))
+          select(starts_with("_SELECTED_CHARGE_"))
+          #select(all_of(input$select_charges))
         tmp[] <- tmp %>%
           lapply(function(x) str_detect(x, regex(drugguncharges, ignore_case = TRUE)))
         policingdata <- policingdata %>%
@@ -1093,9 +1111,9 @@ server <- (function(input, output, session){
         
         # Parse date and time
         policingdata <- policingdata %>%
-          mutate(datetimeofarrest = mdy_hm(datetimeofarrest, tz = input$select_timezone)) %>%
-          mutate(Date = date(datetimeofarrest), Day = wday(datetimeofarrest, label = TRUE), Time = as_hms(datetimeofarrest)) %>%
-          select(-datetimeofarrest)
+          mutate(DateTime = mdy_hm(DateTime, tz = input$select_timezone)) %>%
+          mutate(Date = date(DateTime), Day = wday(DateTime, label = TRUE), Time = as_hms(DateTime)) %>%
+          select(-DateTime)
         
         # Identify quality of life crimes
         # May eventually need user input to identify relevant charges
@@ -1109,7 +1127,8 @@ server <- (function(input, output, session){
           pull(charge) %>%
           paste0(collapse = "|")
         tmp <- policingdata %>%
-          select(all_of(input$select_charges))
+          select(starts_with("_SELECTED_CHARGE_"))
+          #select(all_of(input$select_charges))
         tmp[] <- tmp %>%
           lapply(function(x) str_detect(x, regex(qolcharges, ignore_case = TRUE)))
         policingdata <- policingdata %>%
@@ -1117,11 +1136,12 @@ server <- (function(input, output, session){
         
         # Dump raw charges
         policingdata <- policingdata %>%
-          select(-input$select_charges) 
+          select(-starts_with("_SELECTED_CHARGE_"))
+          #select(-input$select_charges) 
         
         # Put in nice order
         policingdata <- policingdata %>%
-          relocate(Race, Gender, traffic, arrest, bondamount, druggun, Patrol, Officer, Date, Day, Time, qol) %>%
+          relocate(Race, Gender, traffic, Arrest, BondAmount, druggun, Patrol, Officer, Date, Day, Time, qol) %>%
           as.data.frame %>%
           remove_attributes("spec")
         
@@ -1483,9 +1503,8 @@ server <- (function(input, output, session){
         question <- 5
 
         # Racial breakdown of arrests
-        
         observed <- policingdata %>%
-          filter(arrest == TRUE) %>%
+          filter(Arrest == TRUE) %>%
           group_by(Race, Gender) %>%
           summarise(people = n()) %>%
           ungroup %>%
@@ -1572,7 +1591,7 @@ server <- (function(input, output, session){
         # Note: we treat proportions as 0 when the calculation is 0/0
         qdata <- policingdata %>%
           group_by(Race, Gender) %>%
-          summarise(arrests = sum(arrest), incidents = n()) %>%
+          summarise(arrests = sum(Arrest), incidents = n()) %>%
           ungroup %>%
           complete(Race, Gender, fill = list(arrests = 0, incidents = 0)) %>%
           mutate(proportion = arrests/(incidents + .Machine$double.eps)) %>%
@@ -1607,10 +1626,9 @@ server <- (function(input, output, session){
         question <- 7
         
         # Bond amount
-        
         qdata <- policingdata %>%
           group_by(Race, Gender) %>%
-          summarise(meanbond = mean(bondamount, na.rm = TRUE)) %>%
+          summarise(meanbond = mean(BondAmount, na.rm = TRUE)) %>%
           ungroup %>%
           complete(Race, Gender, fill = list(meanbond = NA))
         
@@ -1780,6 +1798,7 @@ server <- (function(input, output, session){
         updateUI(isolate(globalVars$changed))
       },
       error=function(e){
+        removeModal()
         shinyalert("Oops!", "Something went wrong. Check your census api key, and ensure your date and time column is formatted as Month-Day-Year-Hour-Minute compatible.", type = "error")
       }
     )
@@ -1821,7 +1840,7 @@ server <- (function(input, output, session){
         ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
         ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
         saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
-        write.csv(x = globalVars$dataset, file = "CleanedInputFile.csv")
+        write.csv(x = globalVars$dataset, file = "CleanedInputFile.csv", row.names = F)
         zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
       } 
     }
