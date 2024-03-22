@@ -1,5 +1,4 @@
 
-
 server <- (function(input, output, session){
   options(scipen = 4)
   options(shiny.maxRequestSize=30*1024^2)
@@ -23,6 +22,9 @@ server <- (function(input, output, session){
       hideTab(inputId = "main", target = "Q8")
       hideTab(inputId = "main", target = "Q9")
       hideTab(inputId = "main", target = "Q10")
+      hideTab(inputId = "main", target = "Q11")
+      hideTab(inputId = "main", target = "Q12")
+      hideTab(inputId = "main", target = "Q13")
       
       shinyjs::show("completeAnalysis")
     }else{
@@ -37,6 +39,9 @@ server <- (function(input, output, session){
       showTab(inputId = "main", target = "Q8")
       showTab(inputId = "main", target = "Q9")
       showTab(inputId = "main", target = "Q10")
+      showTab(inputId = "main", target = "Q11") 
+      showTab(inputId = "main", target = "Q12") 
+      showTab(inputId = "main", target = "Q13")
       
       shinyjs::hide("completeAnalysis")
     }
@@ -125,6 +130,15 @@ server <- (function(input, output, session){
                            choices = c("","US/Central", "US/Eastern", "US/Mountain", 
                                        "US/Pacific", "UTC"),
                            selected = unique(globalVars$dataset[["TimeZone"]]))
+      # fill use of force column select
+      updateSelectizeInput(session, "select_useofforce", choices = c(colnames(globalVars$dataset)), selected = "UseOfForce")
+      
+      # fill search conducted column select
+      updateSelectizeInput(session, "select_searchconducted", choices = c(colnames(globalVars$dataset)), selected = "SearchConducted")
+      
+      # fill stopped column select
+      updateSelectizeInput(session, "select_stopped", choices = c(colnames(globalVars$dataset)), selected = "Stopped")
+      
       globalVars$clean <- TRUE
     }else{
       # update all column inputs to have column names to select
@@ -157,6 +171,16 @@ server <- (function(input, output, session){
                            choices = c("", "US/Central", "US/Eastern", "US/Mountain", 
                                        "US/Pacific", "UTC"),
                            selected = )
+      
+      # fill use of force column select
+      updateSelectizeInput(session, "select_useofforce", choices = c(colnames(globalVars$dataset)), selected = "UseOfForce")
+      
+      # fill search conducted column select
+      updateSelectizeInput(session, "select_searchconducted", choices = c(colnames(globalVars$dataset)), selected = "SearchConducted")
+      
+      # fill stopped column select
+      updateSelectizeInput(session, "select_stopped", choices = c(colnames(globalVars$dataset)), selected = "Stopped")
+      
       globalVars$clean <- FALSE
     }
   }
@@ -175,7 +199,7 @@ server <- (function(input, output, session){
     if("" %in% c(input$select_race_column, input$select_aian, input$select_asian, input$select_black, input$select_hispanic, input$select_nhpi, input$select_white, input$select_multi, input$select_notlisted, 
                  input$select_gender_column, input$select_woman, input$select_man, 
                  input$select_charges, input$select_arrest, input$select_arrestTypes, input$select_bond, input$select_patrol, input$select_arrestingofficer, 
-                 input$select_date, input$select_timezone, 
+                 input$select_date, input$select_timezone, input$select_useofforce, input$select_searchconducted, input$selected_stopped,
                  input$census_api_key, input$census_year, input$geolevel, input$state, input$county, input$municipality)){
       shinyjs::disable("completeAnalysis")
     }else{
@@ -216,6 +240,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_aian,{
@@ -398,6 +428,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce) 
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_woman,{
@@ -447,6 +483,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_arrest,{
@@ -479,6 +521,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_arrestTypes,{
@@ -508,6 +556,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped) 
   })
   
   observeEvent(input$select_patrol,{
@@ -532,6 +586,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_arrestingofficer,{
@@ -556,6 +616,12 @@ server <- (function(input, output, session){
     #updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_date,{
@@ -580,6 +646,12 @@ server <- (function(input, output, session){
     updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
     # fill date column select
     #updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce)
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted)
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped)
   })
   
   observeEvent(input$select_timezone,{
@@ -655,6 +727,101 @@ server <- (function(input, output, session){
     globalVars$changed <- TRUE
     updateUI(isolate(globalVars$changed))
   })
+  
+  observeEvent(input$select_useofforce,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_useofforce))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, otherselects), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    #updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce) ###### ADDED
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted) ###### ADDED
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped) ###### ADDED
+  })
+  
+  ##########
+  
+  observeEvent(input$select_searchconducted,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_searchconducted))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, otherselects), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce) ###### ADDED
+    # fill search conducted column select
+    #updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted) ###### ADDED
+    # fill stopped column select
+    updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped) ###### ADDED
+  })
+  
+  #############
+  
+  observeEvent(input$select_stopped,{
+    globalVars$changed <- TRUE
+    updateUI(isolate(globalVars$changed))
+    
+    # update all column inputs to have column names to select
+    otherselects <- c(setdiff(colnames(globalVars$dataset), input$select_stopped))
+    # fill race column select
+    updateSelectizeInput(session, "select_race_column", choices = c(input$select_race_column, otherselects), selected=input$select_race_column)
+    # fill gender column select
+    updateSelectizeInput(session, "select_gender_column", choices = c(input$select_gender_column, otherselects), selected=input$select_gender_column)
+    # fill charge column selectize
+    updateSelectizeInput(session, "select_charges", choices = c(input$select_charges, otherselects), selected=input$select_charges)
+    # fill arrest column select
+    updateSelectizeInput(session, "select_arrest", choices = c(input$select_arrest, otherselects), selected=input$select_arrest)
+    # fill bond amount column select
+    updateSelectizeInput(session, "select_bond", choices = c(input$select_bond, otherselects), selected=input$select_bond)
+    # fill patrol column select
+    updateSelectizeInput(session, "select_patrol", choices = c(input$select_patrol, otherselects), selected=input$select_patrol)
+    # fill arresting officer column select
+    updateSelectizeInput(session, "select_arrestingofficer", choices = c(input$select_arrestingofficer, otherselects), selected=input$select_arrestingofficer)
+    # fill date column select
+    updateSelectizeInput(session, "select_date", choices = c(input$select_date, otherselects), selected=input$select_date)
+    # fill use of force column select
+    updateSelectizeInput(session, "select_useofforce", choices = c(input$select_useofforce, otherselects), selected=input$select_useofforce) ###### ADDED
+    # fill search conducted column select
+    updateSelectizeInput(session, "select_searchconducted", choices = c(input$select_searchconducted, otherselects), selected=input$select_searchconducted) ###### ADDED
+    # fill stopped column select
+    #updateSelectizeInput(session, "select_stopped", choices = c(input$select_stopped, otherselects), selected=input$select_stopped) ###### ADDED
+  })
+  
   
   ##############################################################################################################
   # Upload Data
@@ -737,6 +904,15 @@ server <- (function(input, output, session){
       updateSelectizeInput(session, "county", choices=c(""), selected="")
       updateSelectizeInput(session, "municipality", choices=c(""), selected="")
       
+      # fill use of force column select
+      updateSelectizeInput(session, "select_useofforce", choices = c(colnames(globalVars$dataset)), selected = "")
+      
+      # fill search conducted column select
+      updateSelectizeInput(session, "select_searchconducted", choices = c(colnames(globalVars$dataset)), selected = "")
+      
+      # fill stopped column select
+      updateSelectizeInput(session, "select_stopped", choices = c(colnames(globalVars$dataset)), selected = "")
+      
       globalVars$clean <- FALSE
       
       globalVars$dataset <- NULL
@@ -808,6 +984,15 @@ server <- (function(input, output, session){
     # Date and time
     datetimecolumn <- input$select_date
     timezone <- input$select_timezone
+    
+    # Use of Force
+    useofforcecolumn <- input$select_useofforce 
+    
+    # Search Conducted
+    searchconductedcolumn <- input$select_searchconducted
+    
+    # Stopped
+    stoppedcolumn <- input$select_stopped
     
     #################################
     ### Tidy up policing data set ###
@@ -889,9 +1074,24 @@ server <- (function(input, output, session){
       rename(DateTime = !!datetimecolumn) %>%
       mutate(TimeZone = input$select_timezone)
     
+    # Use of Force
+    policingdata <- policingdata %>%
+      rename(UseOfForce = !!useofforcecolumn) %>% 
+      mutate(UseOfForce = factor(UseOfForce))
+    
+    # Search Conducted
+    policingdata <- policingdata %>%
+      rename(SearchConducted = !!searchconductedcolumn) %>% 
+      mutate(SearchConducted = factor(SearchConducted))
+    
+    # Stopped
+    policingdata <- policingdata %>%
+      rename(Stopped = !!stoppedcolumn) %>%
+      mutate(Stopped = factor(Stopped))
+    
     # Put in nice order
     policingdata <- policingdata %>%
-      relocate(Race, Gender, Arrest, BondAmount, Patrol, Officer, DateTime, starts_with("_SELECTED_CHARGE_")) %>%
+      relocate(Race, Gender, Arrest, BondAmount, Patrol, Officer, DateTime, UseOfForce, SearchConducted, Stopped, starts_with("_SELECTED_CHARGE_")) %>%
       as.data.frame %>%
       remove_attributes("spec")
     
@@ -1141,7 +1341,7 @@ server <- (function(input, output, session){
         
         # Put in nice order
         policingdata <- policingdata %>%
-          relocate(Race, Gender, traffic, Arrest, BondAmount, druggun, Patrol, Officer, Date, Day, Time, qol) %>%
+          relocate(Race, Gender, traffic, Arrest, BondAmount, druggun, Patrol, Officer, Date, Day, Time, qol, UseOfForce, SearchConducted, Stopped) %>%
           as.data.frame %>%
           remove_attributes("spec")
         
@@ -1161,633 +1361,995 @@ server <- (function(input, output, session){
         ### Below, question numbers correspond to questions as listed at:
         ### https://docs.google.com/spreadsheets/d/1A9x00WhdQccfwa3XolplvPtjBYgd32k-qEpDpFVfddo/edit#gid=0
         
+        analyze_answerable_questions <- function(policingdata) {
+          # Define required columns for each question
+          question_cols <- list(
+            Q1 = c("Race", "Gender"),
+            Q2 = c("Race", "Gender", "traffic"),
+            Q3 = c("Race", "Gender", "druggun"),
+            Q4 = c("Race", "Gender", "qol"),
+            Q5 = c("Race", "Gender", "Arrest"),
+            Q6 = c("Race", "Gender", "Arrest"),
+            Q7 = c("Race", "Gender", "BondAmount"),
+            Q8 = c("Patrol", "Race"),
+            Q9 = c("Officer", "Race"),
+            Q10 = c("Day", "Time"),
+            Q11 = c("Race", "Gender"),
+            Q12 = c("Race", "Gender", "Stopped"),
+            Q13 = c("Race", "Gender", "SearchConducted")
+          )
+          
+          # Initialize counter for answerable questions
+          answerable_questions <- 0
+          
+          # Loop through questions and check data availability
+          for (question in names(question_cols)) {
+            if (all(question_cols[[question]] %in% colnames(policingdata))) {
+              answerable_questions <- answerable_questions + 1
+            }
+          }
+          
+          return(answerable_questions)
+        }
+        
+        #answerable_count <- analyze_answerable_questions(policingdata)
+        #cat("Number of questions answered are ", answerable_count)
+        
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 1 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 1 of 13...", footer=NULL))
         question <- 1
         
-        observed <- policingdata %>%
-          group_by(Race, Gender) %>%
-          summarise(people = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(people = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        expected <- acsracegender %>%
-          complete(Race, Gender, fill = list(proportion = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
-        
-        qdata <- observed %>%
-          mutate(proportion = prop.table(people)) %>%
-          select(-people) %>%
-          mutate(datatype = "Policing Records") %>%
-          rbind(acsracegender) %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          mutate(datatype = factor(datatype)) %>%
-          mutate(datatype = relevel(datatype, ref = "Policing Records"))
-        
-        p <- qdata %>%
-          ggplot(aes(x = Gender, y = Race, size = proportion, fill = datatype, group = datatype, alpha = datatype)) +
-          geom_point(shape = 21, stroke = 0.6, color = "black") +
-          scale_size(range = c(1,20)) +
-          scale_fill_manual(values = c("red","gray30")) +
-          scale_alpha_manual(values = c(0.7, 0.9)) +
-          ylab("Race") +
-          scale_x_discrete(name = "Gender", position = "top") +
-          scale_y_discrete(limits = rev) +
-          guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
-          theme_bw() +
-          theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-        
-        globalVars$p1 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
-        
-        globalVars$t1 <- qExcel
-        
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        deleteData(wb, sheet = question, cols = 1, rows = 2)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
-        writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
-        writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
-        mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
-        mergeCells(wb, sheet = question, rows = 1, cols = 6:7)
-        writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing")
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
-        if (chisq$p.value < 0.05) {
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
-          globalVars$m1 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
-        }else{
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
-          globalVars$m1 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender") %in% colnames(policingdata)) & all(c("Race", "Gender") %in% colnames(acsracegender))) {
+          # Data available, proceed with analysis
+          observed <- policingdata %>%
+            group_by(Race, Gender) %>%
+            summarise(people = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(people = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          expected <- acsracegender %>%
+            complete(Race, Gender, fill = list(proportion = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
+          
+          qdata <- observed %>%
+            mutate(proportion = prop.table(people)) %>%
+            select(-people) %>%
+            mutate(datatype = "Policing Records") %>%
+            rbind(acsracegender) %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records")) %>%
+            filter(Gender != "Missing gender data") %>%
+            filter(Race != "Missing race data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) +
+            geom_bar(stat = "identity", position = "stack") +
+            xlab("Race") +
+            ylab("Proportion") + 
+            scale_fill_manual(values = c("coral", "blue"),
+                              guide = guide_legend(title = "Gender"), 
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.4, 0.8),
+                               guide = guide_legend(title = "Data Type"),
+                               labels = c("Policing Records", "Local Population")) +
+            facet_wrap(~Gender)+
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+            theme_bw() +
+            theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+          
+          globalVars$p1 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+          
+          globalVars$t1 <- qExcel
+          
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          deleteData(wb, sheet = question, cols = 1, rows = 2)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
+          writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
+          #writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
+          mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
+          #mergeCells(wb, sheet = question, rows = 1, cols = 6:7) 
+          writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
+          writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population") 
+          writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
+          writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing")
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
+          if (chisq$p.value < 0.05) {
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+            globalVars$m1 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }else{
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+            globalVars$m1 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q1_interp <- renderUI({
+            text <- "Data for question Q1 is missing."
+            return(tags$p(text))
+          })
         }
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 2 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 2 of 13...", footer=NULL))
         question <- 2
         
-        # Racial breakdown of traffic-related offenses
-        
-        observed <- policingdata %>%
-          filter(traffic == TRUE) %>%
-          group_by(Race, Gender) %>%
-          summarise(people = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(people = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        expected <- acsracegender %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
-        
-        qdata <- observed %>%
-          mutate(proportion = prop.table(people)) %>%
-          select(-people) %>%
-          mutate(datatype = "Policing Records") %>%
-          rbind(acsracegender) %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          mutate(datatype = factor(datatype)) %>%
-          mutate(datatype = relevel(datatype, ref = "Policing Records"))
-        
-        p <- qdata %>%
-          ggplot(aes(x = Gender, y = Race, size = proportion, fill = datatype, group = datatype, alpha = datatype)) +
-          geom_point(shape = 21, stroke = 0.6, color = "black") +
-          scale_size(range = c(1,20)) +
-          scale_fill_manual(values = c("red","gray30")) +
-          scale_alpha_manual(values = c(0.7, 0.9)) +
-          ylab("Race") +
-          scale_x_discrete(name = "Gender", position = "top") +
-          scale_y_discrete(limits = rev) +
-          guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
-          theme_bw() +
-          theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-        
-        globalVars$p2 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
-        
-        globalVars$t2 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        deleteData(wb, sheet = question, cols = 1, rows = 2)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
-        writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
-        writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
-        mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
-        mergeCells(wb, sheet = question, rows = 1, cols = 6:7)
-        writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing")
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
-        if (chisq$p.value < 0.05) {
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
-          globalVars$m2 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
-        }else{
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
-          globalVars$m2 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "traffic") %in% colnames(policingdata))) {
+          # Racial breakdown of traffic-related offenses
+          
+          observed <- policingdata %>%
+            filter(traffic == TRUE) %>%
+            group_by(Race, Gender) %>%
+            summarise(people = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(people = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          expected <- acsracegender %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
+          
+          qdata <- observed %>%
+            mutate(proportion = prop.table(people)) %>%
+            select(-people) %>%
+            mutate(datatype = "Policing Records") %>%
+            rbind(acsracegender) %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records")) %>%
+            filter(Gender != "Missing gender data") %>%
+            filter(Race != "Missing race data")
+          
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) +
+            geom_bar(stat = "identity", position = "stack") +
+            xlab("Race") +
+            ylab("Proportion") +
+            scale_fill_manual(values = c("coral", "blue"),
+                              guide = guide_legend(title = "Gender"), 
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.3, 0.7), 
+                               guide = guide_legend(title = "Data Type"), 
+                               labels = c("Policing Records", "Local Population")) +
+            facet_wrap(~Gender)+
+            theme_bw() +
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+            theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+          
+          
+          globalVars$p2 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+          
+          globalVars$t2 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          deleteData(wb, sheet = question, cols = 1, rows = 2)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
+          writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
+          #writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
+          mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
+          #mergeCells(wb, sheet = question, rows = 1, cols = 6:7) 
+          writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
+          writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population") 
+          writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
+          writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
+          # writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing") 
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
+          if (chisq$p.value < 0.05) {
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+            globalVars$m2 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }else{
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+            globalVars$m2 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q2_interp <- renderUI({
+            text <- "Data for question Q2 is missing."
+            return(tags$p(text))
+          })
         }
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 3 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 3 of 13...", footer=NULL))
         question <- 3
         
-        observed <- policingdata %>%
-          filter(druggun == TRUE) %>%
-          group_by(Race, Gender) %>%
-          summarise(people = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(people = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        expected <- acsracegender %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
-        
-        qdata <- observed %>%
-          mutate(proportion = prop.table(people)) %>%
-          select(-people) %>%
-          mutate(datatype = "Policing Records") %>%
-          rbind(acsracegender) %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          mutate(datatype = factor(datatype)) %>%
-          mutate(datatype = relevel(datatype, ref = "Policing Records"))
-        
-        p <- qdata %>%
-          ggplot(aes(x = Gender, y = Race, size = proportion, fill = datatype, group = datatype, alpha = datatype)) +
-          geom_point(shape = 21, stroke = 0.6, color = "black") +
-          scale_size(range = c(1,20)) +
-          scale_fill_manual(values = c("red","gray30")) +
-          scale_alpha_manual(values = c(0.7, 0.9)) +
-          ylab("Race") +
-          scale_x_discrete(name = "Gender", position = "top") +
-          scale_y_discrete(limits = rev) +
-          guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
-          theme_bw() +
-          theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-        
-        globalVars$p3 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
-        
-        globalVars$t3 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        deleteData(wb, sheet = question, cols = 1, rows = 2)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
-        writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
-        writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
-        mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
-        mergeCells(wb, sheet = question, rows = 1, cols = 6:7)
-        writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing")
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
-        if (chisq$p.value < 0.05) {
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
-          globalVars$m3 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
-        }else{
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
-          globalVars$m3 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "druggun") %in% colnames(policingdata))) {
+          observed <- policingdata %>%
+            filter(druggun == TRUE) %>%
+            group_by(Race, Gender) %>%
+            summarise(people = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(people = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          expected <- acsracegender %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
+          
+          qdata <- observed %>%
+            mutate(proportion = prop.table(people)) %>%
+            select(-people) %>%
+            mutate(datatype = "Policing Records") %>%
+            rbind(acsracegender) %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records")) %>%
+            filter(Gender != "Missing gender data") %>% 
+            filter(Race != "Missing race data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) + 
+            geom_bar(stat = "identity", position = "stack") +
+            xlab("Race") + 
+            ylab("Proportion") + 
+            scale_fill_manual(values = c("coral", "blue"),
+                              guide = guide_legend(title = "Gender"),
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.3, 0.7),
+                               guide = guide_legend(title = "Data Type"), 
+                               labels = c("Policing Records", "Local Population")) +
+            facet_wrap(~Gender)+
+            theme_bw() +
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+            theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+          
+          globalVars$p3 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+          
+          globalVars$t3 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          deleteData(wb, sheet = question, cols = 1, rows = 2)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
+          writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
+          #writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data") 
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
+          mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
+          #mergeCells(wb, sheet = question, rows = 1, cols = 6:7) 
+          writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
+          writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population") 
+          writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
+          writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing") 
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
+          if (chisq$p.value < 0.05) {
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+            globalVars$m3 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }else{
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+            globalVars$m3 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q3_interp <- renderUI({
+            text <- "Data for question Q3 is missing."
+            return(tags$p(text))
+          })
         }
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 4 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 4 of 13...", footer=NULL))
         question <- 4
-
-        observed <- policingdata %>%
-          filter(qol == TRUE) %>%
-          group_by(Race, Gender) %>%
-          summarise(people = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(people = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
         
-        expected <- acsracegender %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
-        
-        qdata <- observed %>%
-          mutate(proportion = prop.table(people)) %>%
-          select(-people) %>%
-          mutate(datatype = "Policing Records") %>%
-          rbind(acsracegender) %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          mutate(datatype = factor(datatype)) %>%
-          mutate(datatype = relevel(datatype, ref = "Policing Records"))
-        
-        p <- qdata %>%
-          ggplot(aes(x = Gender, y = Race, size = proportion, fill = datatype, group = datatype, alpha = datatype)) +
-          geom_point(shape = 21, stroke = 0.6, color = "black") +
-          scale_size(range = c(1,20)) +
-          scale_fill_manual(values = c("red","gray30")) +
-          scale_alpha_manual(values = c(0.7, 0.9)) +
-          ylab("Race") +
-          scale_x_discrete(name = "Gender", position = "top") +
-          scale_y_discrete(limits = rev) +
-          guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
-          theme_bw() +
-          theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-        
-        globalVars$p4 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
-        
-        globalVars$t4 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        deleteData(wb, sheet = question, cols = 1, rows = 2)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
-        writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
-        writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
-        mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
-        mergeCells(wb, sheet = question, rows = 1, cols = 6:7)
-        writeData(wb, sheet = question, startRow = 2, startCol = 2, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 4, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 6, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 3, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 5, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 7, "Population")
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
-        if (chisq$p.value < 0.05) {
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
-          globalVars$m4 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
-        } else{
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
-          globalVars$m4 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "qol") %in% colnames(policingdata))) {
+          observed <- policingdata %>%
+            filter(qol == TRUE) %>%
+            group_by(Race, Gender) %>%
+            summarise(people = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(people = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          expected <- acsracegender %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
+          
+          qdata <- observed %>%
+            mutate(proportion = prop.table(people)) %>%
+            select(-people) %>%
+            mutate(datatype = "Policing Records") %>%
+            rbind(acsracegender) %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records")) %>%
+            filter(Gender != "Missing gender data") %>% 
+            filter(Race != "Missing race data") 
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) + 
+            geom_bar(stat = "identity", position = "stack") + 
+            xlab("Race") + 
+            ylab("Proportion") +
+            scale_fill_manual(values = c("coral", "blue"),  
+                              guide = guide_legend(title = "Gender"), 
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.3, 0.7), 
+                               guide = guide_legend(title = "Data Type"),
+                               labels = c("Policing Records", "Local Population")) + 
+            facet_wrap(~Gender)+  
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+            theme_bw() +
+            theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+          
+          globalVars$p4 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+          
+          globalVars$t4 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          deleteData(wb, sheet = question, cols = 1, rows = 2)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
+          writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
+          #writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data") 
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
+          mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
+          #mergeCells(wb, sheet = question, rows = 1, cols = 6:7) 
+          writeData(wb, sheet = question, startRow = 2, startCol = 2, "Policing")
+          writeData(wb, sheet = question, startRow = 2, startCol = 4, "Policing")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 6, "Policing") 
+          writeData(wb, sheet = question, startRow = 2, startCol = 3, "Population")
+          writeData(wb, sheet = question, startRow = 2, startCol = 5, "Population")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 7, "Population") 
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
+          if (chisq$p.value < 0.05) {
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+            globalVars$m4 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          } else{
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+            globalVars$m4 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q4_interp <- renderUI({
+            text <- "Data for question Q4 is missing."
+            return(tags$p(text))
+          })
         }
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        
+
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 5 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 5 of 13...", footer=NULL))
         question <- 5
-
-        # Racial breakdown of arrests
-        observed <- policingdata %>%
-          filter(Arrest == TRUE) %>%
-          group_by(Race, Gender) %>%
-          summarise(people = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(people = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
         
-        expected <- acsracegender %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          filter(Race != "Missing race data") %>%
-          filter(Gender != "Missing gender data") %>%
-          arrange(Race, Gender)
-        
-        chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
-        
-        qdata <- observed %>%
-          mutate(proportion = prop.table(people)) %>%
-          select(-people) %>%
-          mutate(datatype = "Policing Records") %>%
-          rbind(acsracegender) %>%
-          complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
-          mutate(datatype = factor(datatype)) %>%
-          mutate(datatype = relevel(datatype, ref = "Policing Records"))
-        
-        p <- qdata %>%
-          ggplot(aes(x = Gender, y = Race, size = proportion, fill = datatype, group = datatype, alpha = datatype)) +
-          geom_point(shape = 21, stroke = 0.6, color = "black") +
-          scale_size(range = c(1,20)) +
-          scale_fill_manual(values = c("red","gray30")) +
-          scale_alpha_manual(values = c(0.7, 0.9)) +
-          ylab("Race") +
-          scale_x_discrete(name = "Gender", position = "top") +
-          scale_y_discrete(limits = rev) +
-          guides(fill = guide_legend(title = NULL, override.aes = list(size = 4), label.position = "bottom"), size = "none", group = "none", alpha = "none") +
-          theme_bw() +
-          theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-        
-        globalVars$p5 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
-        
-        globalVars$t5 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        deleteData(wb, sheet = question, cols = 1, rows = 2)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
-        writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
-        writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
-        mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
-        mergeCells(wb, sheet = question, rows = 1, cols = 6:7)
-        writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population")
-        writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
-        writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing")
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
-        if (chisq$p.value < 0.05) {
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
-          globalVars$m5 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
-        }else{
-          mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
-          qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
-          globalVars$m5 <- qmessage
-          writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "Arrest") %in% colnames(policingdata))) {
+          # Racial breakdown of arrests
+          observed <- policingdata %>%
+            filter(Arrest == TRUE) %>%
+            group_by(Race, Gender) %>%
+            summarise(people = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(people = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          expected <- acsracegender %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            filter(Race != "Missing race data") %>%
+            filter(Gender != "Missing gender data") %>%
+            arrange(Race, Gender)
+          
+          chisq <- chisq.test(x = observed$people, p = expected$proportion, simulate.p.value = TRUE)
+          
+          qdata <- observed %>%
+            mutate(proportion = prop.table(people)) %>%
+            select(-people) %>%
+            mutate(datatype = "Policing Records") %>%
+            rbind(acsracegender) %>%
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records")) %>%
+            filter(Gender != "Missing gender data") %>%
+            filter(Race != "Missing race data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) +
+            geom_bar(stat = "identity", position = "stack") +
+            xlab("Race") + 
+            ylab("Proportion") + 
+            scale_fill_manual(values = c("coral", "blue"),
+                              guide = guide_legend(title = "Gender"), 
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.3, 0.7),
+                               guide = guide_legend(title = "Data Type"),
+                               labels = c("Policing Records", "Local Population")) +
+            facet_wrap(~Gender)+ 
+            theme_bw() +
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+            theme(legend.text=element_text(size=8), legend.position = "bottom", legend.direction = "horizontal", legend.box = "horizontal", legend.key = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+          
+          globalVars$p5 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender","datatype"), values_from = "proportion") 
+          
+          globalVars$t5 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          deleteData(wb, sheet = question, cols = 1, rows = 2)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Man")
+          writeData(wb, sheet = question, startRow = 1, startCol = 4, "Woman")
+          #writeData(wb, sheet = question, startRow = 1, startCol = 6, "Missing gender data") 
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:3)
+          mergeCells(wb, sheet = question, rows = 1, cols = 4:5)
+          #mergeCells(wb, sheet = question, rows = 1, cols = 6:7) 
+          writeData(wb, sheet = question, startRow = 2, startCol = 2, "Population")
+          writeData(wb, sheet = question, startRow = 2, startCol = 4, "Population")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 6, "Population") 
+          writeData(wb, sheet = question, startRow = 2, startCol = 3, "Policing")
+          writeData(wb, sheet = question, startRow = 2, startCol = 5, "Policing")
+          #writeData(wb, sheet = question, startRow = 2, startCol = 7, "Policing") 
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:7, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:11, cols = 2:7, gridExpand = TRUE)
+          if (chisq$p.value < 0.05) {
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions appear to differ significantly from the population proportions."
+            globalVars$m5 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }else{
+            mergeCells(wb, sheet = question, rows = 13, cols = 1:7)
+            qmessage <- "The policing data proportions do not appear to differ significantly from the population proportions."
+            globalVars$m5 <- qmessage
+            writeData(wb, sheet = question, startRow = 13, startCol = 1, qmessage)
+          }
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q5_interp <- renderUI({
+            text <- "Data for question Q5 is missing."
+            return(tags$p(text))
+          })
         }
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 6 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 6 of 13...", footer=NULL))
         question <- 6
         
-        # Proportion arrests for different gender/race
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "Arrest") %in% colnames(policingdata))) {
+          # Proportion arrests for different gender/race
+          
+          # Note: we treat proportions as 0 when the calculation is 0/0
+          qdata_policing <- policingdata %>%
+            group_by(Race, Gender) %>%
+            summarise(arrests = sum(Arrest), incidents = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(arrests = 0, incidents = 0)) %>%
+            mutate(proportion = arrests/(incidents + .Machine$double.eps)) %>%
+            select(-arrests, -incidents) %>%
+            filter(Gender != "Missing gender data") %>%  
+            filter(Race != "Missing race data") %>%
+            mutate(datatype = "Policing Records") 
+          
+          print("Q6 Policing Data QDATA")
+          print(qdata_policing)
+          
+          qdata_population <- acsracegender %>% 
+            group_by(Race, Gender) %>% 
+            mutate(datatype = "Local Population") %>%
+            arrange(Race, Gender)
+          
+          print("Q6 Population Data QDATA")
+          print(qdata_population)
+          
+          qdata_policing$proportion <- qdata_policing$proportion * qdata_population$proportion
+          
+          qdata <- bind_rows(qdata_policing, qdata_population)
+          
+          qdata <- qdata %>% 
+            complete(Race, Gender, datatype, fill = list(proportion = 0)) %>%
+            mutate(datatype = factor(datatype)) %>%
+            mutate(datatype = relevel(datatype, ref = "Policing Records"))  %>% 
+            filter(Race != "Missing race data") %>% 
+            filter(Gender != "Missing gender data") 
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = proportion, fill = Gender, alpha = datatype)) +
+            geom_bar(stat = "identity", position = "stack") + 
+            scale_fill_manual(values = c("coral", "blue"),
+                              guide = guide_legend(title = "Gender", order = 1), 
+                              labels = c("Man", "Women")) + 
+            scale_alpha_manual(values = c(0.3, 0.7),
+                               guide = guide_legend(title = "Data Type", order = 2), 
+                               labels = c("Local Population", "Policing Records")) +
+            facet_wrap(~Gender)+ 
+            theme_bw() + 
+            #theme(axis.text.x = element_text(angle = 45, hjust = 1))
+            theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
+          
+          globalVars$p6 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender", "datatype"), values_from = "proportion") 
+          
+          globalVars$t6 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:4, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:4, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:4, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q6_interp <- renderUI({
+            text <- "Data for question Q6 is missing."
+            return(tags$p(text))
+          })
+        }
         
-        # Note: we treat proportions as 0 when the calculation is 0/0
-        qdata <- policingdata %>%
-          group_by(Race, Gender) %>%
-          summarise(arrests = sum(Arrest), incidents = n()) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(arrests = 0, incidents = 0)) %>%
-          mutate(proportion = arrests/(incidents + .Machine$double.eps)) %>%
-          select(-arrests, -incidents)
-        
-        p <- qdata %>%
-          ggplot(aes(x = Race, y = proportion, fill = Gender)) +
-          geom_col(position = position_dodge()) +
-          scale_y_continuous(name = "Proportion of Incidents\nResulting in Arrest", limits = c(0,1)) +
-          theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-        
-        globalVars$p6 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender"), values_from = "proportion") 
-        
-        globalVars$t6 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:4, gridExpand = TRUE)
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
-        setColWidths(wb, sheet = question, cols = 2:4, widths = 20, ignoreMergedCells = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:4, gridExpand = TRUE)
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 7 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 7 of 13...", footer=NULL))
         question <- 7
         
-        # Bond amount
-        qdata <- policingdata %>%
-          group_by(Race, Gender) %>%
-          summarise(meanbond = mean(BondAmount, na.rm = TRUE)) %>%
-          ungroup %>%
-          complete(Race, Gender, fill = list(meanbond = NA))
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "BondAmount") %in% colnames(policingdata))) {
+          # Bond amount
+          qdata <- policingdata %>%
+            group_by(Race, Gender) %>%
+            summarise(meanbond = mean(BondAmount, na.rm = TRUE)) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(meanbond = NA)) %>%
+            filter(Gender != "Missing gender data") %>% 
+            filter(Race != "Missing race data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Race, y = meanbond, fill = Gender)) +
+            geom_col(position = position_dodge()) +
+            scale_fill_manual(values = c("cyan", "grey30")) +
+            scale_y_continuous(name = "Mean Bond Amount") +
+            theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
+          
+          globalVars$p7 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender"), values_from = "meanbond") 
+          
+          globalVars$t7 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:4, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:4, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded2, rows = 3:(nrow(qExcel) + 2), cols = 2:4, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q7_interp <- renderUI({
+            text <- "Data for question Q7 is missing."
+            return(tags$p(text))
+          })
+        }
         
-        p <- qdata %>%
-          ggplot(aes(x = Race, y = meanbond, fill = Gender)) +
-          geom_col(position = position_dodge()) +
-          scale_y_continuous(name = "Mean Bond Amount") +
-          theme(legend.position = "top", legend.direction = "horizontal", axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-        
-        globalVars$p7 <- p
-        
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Gender"), values_from = "meanbond") 
-        
-        globalVars$t7 <- qExcel
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:4, gridExpand = TRUE)
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
-        setColWidths(wb, sheet = question, cols = 2:4, widths = 20, ignoreMergedCells = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded2, rows = 3:(nrow(qExcel) + 2), cols = 2:4, gridExpand = TRUE)
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 8 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 8 of 13...", footer=NULL))
         question <- 8
         
-        qdata <- policingdata %>%
-          group_by(Patrol, Race) %>%
-          summarise(count = n()) %>%
-          ungroup %>%
-          complete(Patrol, Race, fill = list(count = 0)) %>%
-          group_by(Patrol) %>%
-          mutate(proportion = prop.table(count))
+        # Check if data is available for analysis
+        if (all(c("Patrol", "Race") %in% colnames(policingdata))) {
+          qdata <- policingdata %>%
+            group_by(Patrol, Race) %>%
+            summarise(count = n()) %>%
+            ungroup %>%
+            complete(Patrol, Race, fill = list(count = 0)) %>%
+            group_by(Patrol) %>%
+            mutate(proportion = prop.table(count))
+            filter(Race != "Missing race data")
+          
+          p <- ggplot() +
+            geom_col(data = qdata, aes(x = Patrol, y = proportion, fill = Race)) +
+            ylab("Proportion")
+          
+          globalVars$p8 <- p
+          
+          qExcel <- qdata %>%
+            select(-count) %>%
+            pivot_wider(names_from = c("Race"), values_from = "proportion") 
+          
+          globalVars$t8 <- qExcel
+          
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:10)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q8_interp <- renderUI({
+            text <- "Data for question Q8 is missing."
+            return(tags$p(text))
+          })
+        }
         
-        p <- ggplot() +
-          geom_col(data = qdata, aes(x = Patrol, y = proportion, fill = Race)) +
-          ylab("Proportion")
-        
-        globalVars$p8 <- p
-        
-        qExcel <- qdata %>%
-          select(-count) %>%
-          pivot_wider(names_from = c("Race"), values_from = "proportion") 
-        
-        globalVars$t8 <- qExcel
-        
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:10)
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
-        setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 9 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 9 of 13...", footer=NULL))
         question <- 9
         
+        # Check if data is available for analysis
+        if (all(c("Officer", "Race") %in% colnames(policingdata))) {
+          # Racial breakdown for different officers
+          # We will look at top 25% of officers or top 10 officers, whichever is a shorter list
+          
+          officertally <- policingdata %>%
+            group_by(Officer) %>%
+            summarise(count = n()) %>%
+            arrange(desc(count))
+          
+          top25percent <- officertally %>%
+            filter(count >= quantile(count, 0.75)) %>%
+            pull(Officer)
+          
+          top10 <- officertally %>%
+            .[1:10, ] %>%
+            pull(Officer)  
+          
+          officerlist <- intersect(top25percent, top10)
+          
+          qdata <- policingdata %>%
+            filter(Officer %in% officerlist) %>%
+            mutate(Officer = droplevels(Officer)) %>%
+            group_by(Officer, Race) %>%
+            summarise(count = n()) %>%
+            ungroup %>%
+            complete(Officer, Race, fill = list(count = 0)) %>%
+            group_by(Officer) %>%
+            mutate(proportion = prop.table(count))
+            filter(Race != "Missing race data") 
+          
+          p <- ggplot() +
+            geom_col(data = qdata, aes(x = Officer, y = proportion, fill = Race)) +
+            ylab("Proportion") +
+            theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
+          
+          globalVars$p9 <- p
+          
+          
+          qExcel <- qdata %>%
+            select(-count) %>%
+            pivot_wider(names_from = c("Race"), values_from = "proportion") 
+          
+          globalVars$t9 <- qExcel
+          
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:10)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q9_interp <- renderUI({
+            text <- "Data for question Q9 is missing."
+            return(tags$p(text))
+          })
+        }
         
-        # Racial breakdown for different officers
-        # We will look at top 25% of officers or top 10 officers, whichever is a shorter list
-        
-        officertally <- policingdata %>%
-          group_by(Officer) %>%
-          summarise(count = n()) %>%
-          arrange(desc(count))
-        
-        top25percent <- officertally %>%
-          filter(count >= quantile(count, 0.75)) %>%
-          pull(Officer)
-        
-        top10 <- officertally %>%
-          .[1:10, ] %>%
-          pull(Officer)  
-        
-        officerlist <- intersect(top25percent, top10)
-        
-        qdata <- policingdata %>%
-          filter(Officer %in% officerlist) %>%
-          mutate(Officer = droplevels(Officer)) %>%
-          group_by(Officer, Race) %>%
-          summarise(count = n()) %>%
-          ungroup %>%
-          complete(Officer, Race, fill = list(count = 0)) %>%
-          group_by(Officer) %>%
-          mutate(proportion = prop.table(count))
-        
-        p <- ggplot() +
-          geom_col(data = qdata, aes(x = Officer, y = proportion, fill = Race)) +
-          ylab("Proportion") +
-          theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
-        
-        globalVars$p9 <- p
-        
-        
-        qExcel <- qdata %>%
-          select(-count) %>%
-          pivot_wider(names_from = c("Race"), values_from = "proportion") 
-        
-        globalVars$t9 <- qExcel
-        
-        
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Race")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:10)
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
-        setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
-        setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
         
         #########
         ### Q ###
         #########
         removeModal()
-        showModal(modalDialog("Analyzing Question 10 of 10...", footer=NULL))
+        showModal(modalDialog("Analyzing Question 10 of 13...", footer=NULL))
         
         question <- 10
         
-        qdata <- policingdata %>%
-          select(Day, Time) %>%
-          mutate(Time = hour(Time)) %>%
-          group_by(Day, Time) %>%
-          summarise(count = n()) %>%
-          mutate(Day = factor(Day, levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))) %>%
-          mutate(Time = as.factor(Time)) 
+        # Check if data is available for analysis
+        if (all(c("Day", "Time") %in% colnames(policingdata))) {
+          qdata <- policingdata %>%
+            select(Day, Time) %>%
+            mutate(Time = hour(Time)) %>%
+            group_by(Day, Time) %>%
+            summarise(count = n()) %>%
+            mutate(Day = factor(Day, levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun"))) %>%
+            mutate(Time = as.factor(Time)) 
+          
+          day_colors <- c( 
+            "Mon" = "darkblue", 
+            "Tue" = "#ff7f0e",  
+            "Wed" = "darkgreen",  
+            "Thu" = "grey30",  
+            "Fri" = "yellow",  
+            "Sat" = "magenta",  
+            "Sun" = "#17becf"   
+          )
+          
+          p <- qdata %>%
+            ggplot(aes(x = Time, y = count, group = Day, color = Day)) +
+            geom_line(size = 1.5, alpha = 0.7) + 
+            scale_color_manual(values = day_colors) + 
+            scale_y_continuous(name = "Number of Incidents") +
+            scale_x_discrete(name = "Hour of Day") +
+            theme(panel.grid.minor.y = element_blank())
+          
+          globalVars$p10 <- p
+          
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Time"), values_from = "count") %>%
+            ungroup()%>%
+            mutate(newSum = select_if(., is.numeric) %>% reduce(`+`)) %>% 
+            mutate_if(is.numeric, list(~ ./newSum)) %>% 
+            select(-newSum)
+          
+          globalVars$t10 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Hour")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:25)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:25, gridExpand = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:9, cols = 2:25, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q10_interp <- renderUI({
+            text <- "Data for question Q10 is missing."
+            return(tags$p(text))
+          })
+        }
         
-        p <- qdata %>%
-          ggplot(aes(x = Time, y = count, group = Day, color = Day)) +
-          geom_line() +
-          scale_y_continuous(name = "Incidents") +
-          scale_x_discrete(name = "Hour of Day") +
-          theme(panel.grid.minor.y = element_blank())
+        #########
+        ### Q ###
+        #########
         
-        globalVars$p10 <- p
+        removeModal() 
+        showModal(modalDialog("Analyzing Question 11 of 13...", footer=NULL))
         
+        question <- 11
         
-        qExcel <- qdata %>%
-          pivot_wider(names_from = c("Time"), values_from = "count") %>%
-          ungroup()%>%
-          mutate(newSum = select_if(., is.numeric) %>% reduce(`+`)) %>% 
-          mutate_if(is.numeric, list(~ ./newSum)) %>% 
-          select(-newSum)
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender") %in% colnames(policingdata))) {
+          qdata <- policingdata %>%
+            filter(UseOfForce == "Yes") %>%
+            group_by(Race, Gender) %>%
+            summarise(incidents = n()) %>%
+            ungroup %>%
+            complete(Race, Gender, fill = list(incidents = 0)) %>%
+            mutate(proportion = incidents / sum(incidents)) %>%  
+            filter(!is.na(Race) & !is.na(Gender))
+          
+          p <- qdata %>%
+            ggplot(aes(x = Gender, y = proportion, fill = Race)) +
+            geom_bar(stat = "identity", position = "dodge") +
+            ylab("Number of Incidents") +
+            xlab("Gender") +
+            theme_bw() 
+          
+          globalVars$p11 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender"), values_from = "proportion") 
+          
+          globalVars$t11 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q11_interp <- renderUI({
+            text <- "Data for question Q11  is missing."
+            return(tags$p(text))
+          })
+        }
         
-        globalVars$t10 <- qExcel
+        #########
+        ### Q ###
+        #########
+        removeModal() 
+        showModal(modalDialog("Analyzing Question 12 of 13...", footer=NULL))
         
-        writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
-        writeData(wb, sheet = question, startRow = 1, startCol = 2, "Hour")
-        mergeCells(wb, sheet = question, rows = 1, cols = 2:25)
-        addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:25, gridExpand = TRUE)
-        addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:9, cols = 2:25, gridExpand = TRUE)
+        question <- 12
+        
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "Stopped") %in% colnames(policingdata))) {
+          qdata <- policingdata %>%
+            filter(Stopped == "Yes") %>%
+            group_by(Race, Gender) %>%
+            summarise(incidents = n(), .groups = 'drop') %>%
+            ungroup() %>%
+            complete(Race, Gender, fill = list(incidents = 0)) %>%
+            filter(Race != "Missing race data" & Gender != "Missing gender data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Gender, y = Race, size = incidents)) +
+            geom_point(shape = 21, stroke = 0.6, color = "black", fill = "blue") +
+            scale_size_continuous(name = "Number of Street Checks", range = c(1, 20)) +
+            ylab("Race") +
+            xlab("Gender") +
+            scale_x_discrete(position = "top") +
+            scale_y_discrete(limits = rev) +
+            theme_bw() +
+            theme(legend.position = "bottom")
+          
+          globalVars$p12 <- p
+          
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender"), values_from = "incidents")
+          
+          globalVars$t12 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q12_interp <- renderUI({
+            text <- "Data for question Q12 is missing."
+            return(tags$p(text))
+          })
+        }
+        
+        #########
+        ### Q ###
+        #########
+        removeModal() 
+        showModal(modalDialog("Analyzing Question 13 of 13...", footer=NULL)) ###### ADDED!
+        
+        question <- 13
+        
+        # Check if data is available for analysis
+        if (all(c("Race", "Gender", "SearchConducted") %in% colnames(policingdata))) {
+          # Data available, proceed with analysis (existing code for question 13)
+          qdata <- policingdata %>%
+            filter(SearchConducted == "Yes") %>%
+            group_by(Race, Gender) %>%
+            summarise(incidents = n(), .groups = 'drop') %>%
+            ungroup() %>%
+            complete(Race, Gender, fill = list(incidents = 0)) %>%
+            filter(Race != "Missing race data" & Gender != "Missing gender data")
+          
+          p <- qdata %>%
+            ggplot(aes(x = Gender, y = Race, size = incidents)) +
+            geom_point(shape = 21, stroke = 0.6, color = "black", fill = "green") +
+            scale_size_continuous(name = "Number of Searches", range = c(1, 20)) +
+            ylab("Race") +
+            xlab("Gender") +
+            scale_x_discrete(position = "top") +
+            scale_y_discrete(limits = rev) +
+            theme_bw() +
+            theme(legend.position = "bottom")
+          
+          globalVars$p13 <- p
+          
+          qExcel <- qdata %>%
+            pivot_wider(names_from = c("Gender"), values_from = "incidents")
+          
+          globalVars$t13 <- qExcel
+          
+          writeData(wb, sheet = question, x = qExcel, startRow = 2, borderStyle = openxlsx_getOp("borderStyle", "none"), headerStyle = NULL)
+          writeData(wb, sheet = question, startRow = 1, startCol = 2, "Gender")
+          mergeCells(wb, sheet = question, rows = 1, cols = 2:4)
+          addStyle(wb, sheet = question, style = centered, rows = 1:2, cols = 2:10, gridExpand = TRUE)
+          setColWidths(wb, sheet = question, cols = 1, widths = "auto", ignoreMergedCells = TRUE)
+          setColWidths(wb, sheet = question, cols = 2:10, widths = 20, ignoreMergedCells = TRUE)
+          addStyle(wb, sheet = question, style = centeredrounded3, rows = 3:(nrow(qExcel) + 2), cols = 2:10, gridExpand = TRUE)
+        } else {
+          # Data missing, inform user and skip analysis
+          output$Q13_interp <- renderUI({
+            text <- "Data for question Q13 (Race, Gender and SearchConducted variable in policing data) is missing."
+            return(tags$p(text))
+          })
+        }
         
         ########################
         ### SAVE EXCEL SHEET ###
@@ -1823,9 +2385,12 @@ server <- (function(input, output, session){
         ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
         ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
         ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+        ggsave('q11.png', plot=globalVars$p11, width = 6.5, units = "in") ###### ADDED?
+        ggsave('q12.png', plot=globalVars$p12, width = 6.5, units = "in") ###### ADDED?
+        ggsave('q13.png', plot=globalVars$p13, width = 6.5, units = "in") ###### ADDED?
         saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
         
-        zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+        zip::zip(file, files = c(paste("q0", 1:12, ".png", sep=""), "q13.png", "SToPA Tookit.xlsx") ) ###### ADDED?
       }
     }else{
       content = function(file){
@@ -1839,9 +2404,12 @@ server <- (function(input, output, session){
         ggsave('q08.png', plot=globalVars$p8,  width = 6.5, units = "in")
         ggsave('q09.png', plot=globalVars$p9,  width = 6.5, units = "in")
         ggsave('q10.png', plot=globalVars$p10, width = 6.5, units = "in")
+        ggsave('q11.png', plot=globalVars$p11, width = 6.5, units = "in") ###### ADDED?
+        ggsave('q12.png', plot=globalVars$p12, width = 6.5, units = "in") ###### ADDED?
+        ggsave('q13.png', plot=globalVars$p13, width = 6.5, units = "in") ###### ADDED?
         saveWorkbook(globalVars$wb, "SToPA Tookit.xlsx", overwrite = TRUE)
         write.csv(x = globalVars$dataset, file = "CleanedInputFile.csv", row.names = F)
-        zip::zip(file, files = c(paste("q0", 1:9, ".png", sep=""), "q10.png", "SToPA Tookit.xlsx") )
+        zip::zip(file, files = c(paste("q0", 1:12, ".png", sep=""), "q13.png", "SToPA Tookit.xlsx") ) ###### ADDED?
       } 
     }
   )
@@ -2292,6 +2860,132 @@ server <- (function(input, output, session){
           ),
           text = "Download",
           filename = "q10"
+        ))
+    )
+  )
+  
+  ############################################################################## ADDED?
+  ###       Q11         #########################################################
+  ##############################################################################
+  output$Q11_plot <- renderPlot({
+    req(globalVars$p11)
+    print(globalVars$p11)
+  })
+  
+  output$Q11_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q11.", input$Q11_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p11, device = input$Q11_format, width = as.numeric(input$Q11_width),
+             height = as.numeric(input$Q11_height), units = input$Q11_unit
+      )
+    }
+  )
+  
+  output$Q11_tab <- DT::renderDataTable(
+    {
+      globalVars$t11 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q11"
+        ))
+    )
+  )
+  
+  ############################################################################## ADDED?
+  ###       Q12         #########################################################
+  ##############################################################################
+  output$Q12_plot <- renderPlot({
+    req(globalVars$p12)
+    print(globalVars$p12)
+  })
+  
+  output$Q12_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q12.", input$Q12_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p12, device = input$Q12_format, width = as.numeric(input$Q12_width),
+             height = as.numeric(input$Q12_height), units = input$Q12_unit
+      )
+    }
+  )
+  
+  output$Q12_tab <- DT::renderDataTable(
+    {
+      globalVars$t12 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q12"
+        ))
+    )
+  )
+  
+  ############################################################################## ADDED?
+  ###       Q13         #########################################################
+  ##############################################################################
+  output$Q13_plot <- renderPlot({
+    req(globalVars$p13)
+    print(globalVars$p13)
+  })
+  
+  output$Q13_downloadPlot <- downloadHandler(
+    filename = function() {
+      paste("q13.", input$Q13_format, sep = "")
+    },
+    content = function(file) {
+      ggsave(file,
+             plot = globalVars$p13, device = input$Q13_format, width = as.numeric(input$Q13_width),
+             height = as.numeric(input$Q13_height), units = input$Q13_unit
+      )
+    }
+  )
+  
+  output$Q13_tab <- DT::renderDataTable(
+    {
+      globalVars$t13 %>% mutate(across(where(is.numeric), round, 6))
+    },
+    extensions = "Buttons",
+    rownames = FALSE,
+    options = list(
+      dom = "Bfrtip",
+      buttons =
+        list("copy", "print", list(
+          extend = "collection",
+          buttons = list(
+            list(extend = "csv", filename = "prop-test-summary"),
+            list(extend = "excel", filename = "prop-test-summary"),
+            list(extend = "pdf", filename = "prop-test-summary")
+          ),
+          text = "Download",
+          filename = "q13"
         ))
     )
   )

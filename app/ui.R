@@ -107,7 +107,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  selected = NULL,
                                                                                  multiple = FALSE,
                                                                                  options = list(placeholder = "Select a Code"))
-                                                                  ),
+                                                           ),
                                                            column(width=3, 
                                                                   selectizeInput("select_asian",
                                                                                  "Asian Code",
@@ -263,6 +263,46 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  options = list(placeholder = "Select a Column"))
                                                            )
                                                          ),
+                                                         
+                                                         ############################################## ADDED*
+                                                         fluidRow(
+                                                           column(width=4,
+                                                                  h3("Use of Force")),
+                                                           column(width=4,
+                                                                  h3("Search Conducted")),
+                                                           column(width=4,
+                                                                  h3("Stopped"))
+                                                         ),
+                                                         fluidRow(
+                                                           column(width=4,
+                                                                  selectizeInput("select_useofforce",
+                                                                                 "Use of Force Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
+                                                           ),
+                                                           column(width=4,
+                                                                  selectizeInput("select_searchconducted",
+                                                                                 "Search Conducted Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
+                                                           ),
+                                                           column(width=4,
+                                                                  selectizeInput("select_stopped",
+                                                                                 "Stopped Column",
+                                                                                 choices = NULL,
+                                                                                 selected = NULL,
+                                                                                 multiple = FALSE,
+                                                                                 options = list(placeholder = "Select a Column"))
+                                                           )
+                                                         ),
+                                                         
+                                                         ###################################################
+                                                         
+                                                         
                                                          h3("Date and Time"),
                                                          fluidRow(
                                                            column(width=3,
@@ -316,7 +356,7 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                                                  selected = NULL,
                                                                                  multiple=FALSE,
                                                                                  options = list(placeholder = "Select a County"))
-                                                                  ),
+                                                           ),
                                                            column(width=4, #https://www2.census.gov/geo/docs/reference/codes/PLACElist.txt
                                                                   selectizeInput("municipality", label = " Municipality", 
                                                                                  choices = NULL,
@@ -525,6 +565,60 @@ ui<-tagList(tags$head(tags$link(rel = "icon", type = "image/x-icon",
                                                          h1("Numerical Summary"),
                                                          shinycssloaders::withSpinner(DT::dataTableOutput("Q10_tab")), style="margin-bottom: 30px;"),
                                               ),
+                                              
+                                              ###################################################################### ADDED*
+                                              tabPanel("Q11", tags$hr(), value="Q11",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q11_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q11_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q11_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q11_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q11_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q11_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q11_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q12", tags$hr(), value="Q12",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q12_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q12_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q12_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q12_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q12_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q12_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q12_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              tabPanel("Q13", tags$hr(), value="Q13",
+                                                       fluidPage(
+                                                         h1("Graphical Summary"),
+                                                         fluidRow(shinycssloaders::withSpinner(plotOutput("Q13_plot"))),
+                                                         fluidRow(
+                                                           column(width=2, textInput("Q13_height", "Height", value=7)),
+                                                           column(width=2, textInput("Q13_width", "Width", value=7)),
+                                                           column(width=2, selectInput("Q13_unit", "Units", choices = c("in", "cm"))),
+                                                           column(width=2, selectInput("Q13_format", "Format", choices = c("png", "pdf", "tiff", "bmp"))),
+                                                           column(width=2, downloadButton('Q13_downloadPlot'),style = "margin-top: 25px;"), #
+                                                           tags$head(tags$style(HTML(".selectize-input {height: 42px;}")))
+                                                         ),
+                                                         br(),
+                                                         h1("Numerical Summary"),
+                                                         shinycssloaders::withSpinner(DT::dataTableOutput("Q13_tab")), style="margin-bottom: 30px;"),
+                                              ),
+                                              
+                                              ######################################################################
                                   ))
                        ),
                        tabPanel("References",
